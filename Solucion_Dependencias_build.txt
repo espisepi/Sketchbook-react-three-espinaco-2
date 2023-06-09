@@ -1,0 +1,14 @@
+nvm use 16
+
+npm install
+
+¿npm update? - no se si este sirvió de algo
+
+npm i -D @types/node@17.0.41
+
+npm i -D @types/lodash@ts2.5
+
+npm run build
+
+npm run dev
+
