@@ -1,6 +1,9 @@
 
 import { World } from '../../../ts/sketchbook';
 
+import * as nipplejs from 'nipplejs';
+
+
 interface Control {
     desc: String;
     keys: Array<String>;
@@ -21,6 +24,7 @@ export class WorldCustom extends World {
     }
 
     private renderUIMobileButtons(controls: Array<Control>): void {
+        this.renderJoystickCameraMovement();
         for( let i = 0; i < controls.length; i++) {
             const control = controls[i];
             if(control.desc === 'Movement') {
@@ -141,6 +145,48 @@ export class WorldCustom extends World {
         button.addEventListener ("pointerout", function() {
             document.dispatchEvent(new KeyboardEvent('keyup', { key: 'd', code: 'KeyD' }));
         });
+    }
+
+    private renderJoystickCameraMovement(): void {
+        // 1. Create the element
+        const element = document.createElement("div");
+        element.innerHTML = "";
+
+        // 2. Add styles button
+        element.className = 'zone-joystick';
+
+        // 3. Append somewhere
+        const body = document.getElementsByTagName("body")[0];
+        body.appendChild(element);
+
+        // 4. Add event handler
+        const options = {
+            zone: element,
+            // mode: "static",
+            position: { left: "50%", top: "50%" },
+            size: 100,
+        };
+        const joystick = nipplejs.create(options);
+        console.log(joystick);
+        // 3. Add event handlers for joystick movements
+        joystick.on("start", (ev) => {
+            console.log(ev);
+            // document.dispatchEvent(new KeyboardEvent('keydown', { key: 'w', code: 'KeyW' }));
+        });
+
+        joystick.on("end", (ev) => {
+            console.log(ev);
+            // document.dispatchEvent(new KeyboardEvent('keyup', { key: 'w', code: 'KeyW' }));
+        });
+        joystick.on("move", (event, nipple) => {
+            const x = nipple.vector.x;
+            const y = nipple.vector.y;
+        
+            // Utiliza los valores de x e y según sea necesario
+            console.log("Posición X:", x);
+            console.log("Posición Y:", y);
+            this.cameraOperator.move(x,y);
+          });
     }
 
 

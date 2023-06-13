@@ -36,3 +36,12 @@
   left: 6rem;
   bottom: 2rem;
 }
+
+.zone-joystick {
+  position: absolute;
+  bottom: 5rem;
+  right: 2rem;
+  width: 200px;
+  height: 200px;
+  background-color: red;
+}
