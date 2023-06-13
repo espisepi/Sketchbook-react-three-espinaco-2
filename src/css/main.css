@@ -5,3 +5,6 @@
 @import "modules/loadingScreen.css";
 @import "modules/cubeLoader.css";
 @import "modules/welcomeScreen.css";
+
+// Custom css espinaco
+@import "modules/mobileUI.css";
