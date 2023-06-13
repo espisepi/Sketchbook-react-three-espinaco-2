@@ -1,0 +1,2 @@
+
+Se ha modificado el archivo index.html y webpack.common.js

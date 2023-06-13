@@ -528,7 +528,7 @@ export class World
 	private createParamsGUI(scope: World): void
 	{
 		this.params = {
-			Pointer_Lock: false,
+			Pointer_Lock: true,
 			Mouse_Sensitivity: 0.3,
 			Time_Scale: 1,
 			Shadows: true,
