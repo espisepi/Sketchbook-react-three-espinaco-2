@@ -12,5 +12,6 @@ export declare class WorldCustom extends World {
     private renderMovementButtonDown;
     private renderMovementButtonLeft;
     private renderMovementButtonRight;
+    private renderJoystickCameraMovement;
 }
 export {};
