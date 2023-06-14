@@ -9,17 +9,31 @@ interface Control {
     keys: Array<String>;
 }
 
+interface JoystickState {
+    joystick: any;
+    isMove: boolean;
+    velocityMove: number;
+    position: Position;
+}
+
+interface Position {
+    x: number;
+    y: number;
+}
+
 export class WorldCustom extends World {
+
+    public joystickState: JoystickState;
 
     constructor(worldScenePath?: any) {
         super(worldScenePath);
-        console.log("OYEEEEEEEEEEEEE");
+        // console.log("OYEEEEEEEEEEEEE");
     }
 
     public updateControls(controls: Array<Control>): void {
         super.updateControls(controls);
         // Pintar 
-        console.log({controls});
+        // console.log({controls});
         this.renderUIMobileButtons(controls);
     }
 
@@ -159,7 +173,7 @@ export class WorldCustom extends World {
         const body = document.getElementsByTagName("body")[0];
         body.appendChild(element);
 
-        // 4. Add event handler
+        // 4. Attach Joystick
         const options = {
             zone: element,
             // mode: "static",
@@ -167,27 +181,58 @@ export class WorldCustom extends World {
             size: 100,
         };
         const joystick = nipplejs.create(options);
-        console.log(joystick);
-        // 3. Add event handlers for joystick movements
-        joystick.on("start", (ev) => {
-            console.log(ev);
+        // console.log(joystick);
+        this.joystickState = {
+            joystick: joystick,
+            isMove: false,
+            velocityMove: 5,
+            position: {
+                x: 0,
+                y: 0
+            }
+        };
+        // 5. Add event handlers for joystick movements
+        const joystickState = this.joystickState;
+        joystick.on("start", (event, nipple) => {
+            // const x = nipple.vector.x;
+            // const y = nipple.vector.y;
+            // console.log(ev);
             // document.dispatchEvent(new KeyboardEvent('keydown', { key: 'w', code: 'KeyW' }));
+            // joystickState.isMove = true;
+            // joystickState.position.x = x;
+            // joystickState.position.y = y;
         });
 
-        joystick.on("end", (ev) => {
-            console.log(ev);
+        joystick.on("end", (event, nipple) => {
+            // console.log(event);
             // document.dispatchEvent(new KeyboardEvent('keyup', { key: 'w', code: 'KeyW' }));
+            joystickState.isMove = false;
+            joystickState.position.x = 0;
+            joystickState.position.y = 0;
         });
         joystick.on("move", (event, nipple) => {
             const x = nipple.vector.x;
             const y = nipple.vector.y;
         
             // Utiliza los valores de x e y según sea necesario
-            console.log("Posición X:", x);
-            console.log("Posición Y:", y);
-            this.cameraOperator.move(x,y);
-          });
+            // console.log("Posición X:", x);
+            // console.log("Posición Y:", y);
+            joystickState.isMove = true;
+            joystickState.position.x = x;
+            joystickState.position.y = y;
+            // this.cameraOperator.move(x,y); // Se hace en el metodo update
+        });
     }
+
+    public update(timeStep: number, unscaledTimeStep: number): void {
+        super.update(timeStep, unscaledTimeStep);
+        if(this.joystickState?.isMove) {
+            this.cameraOperator.move(
+                this.joystickState.position.x * this.joystickState.velocityMove,
+                this.joystickState.position.y * this.joystickState.velocityMove);
+        }
+    }
+
 
 
 }
