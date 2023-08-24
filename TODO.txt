@@ -1,4 +1,4 @@
-1 - Instalar y usar nvm
+1 - Instalar y usar nvm (https://tecadmin.net/install-nvm-macos-with-homebrew/)
 2 - Arrancar el proyecto
 3 - Actualizar las versiones de threejs y cannonjs
 
@@ -6,3 +6,7 @@
 4.2 - Desarrollar mundo de VideoPoints con Stars
 4.3 - Desarrollar juego de carrera de coches con checkpoint
 4.4 - Mejorar la UI de Mobile para que aparezca y desaparezca
+
+5 - Con el curso de udemy de juegos en html5, meterle dentro un minijuego
+(por ejemplo tetris) y cuando termine el juego dejar el escenario 3D para poder
+visitarlo con Sketchbook
