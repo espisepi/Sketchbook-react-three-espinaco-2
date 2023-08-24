@@ -2,6 +2,8 @@
 2 - Arrancar el proyecto
 3 - Actualizar las versiones de threejs y cannonjs
 
+4.1 - Poner mapa de videojuego (https://github.com/magcius/noclip.website) (pasar de poligonos en noclip a objetos threejs y fisicas de cannon)
+
 4.1 - Desarrollar multiplayer con ejemplo de seanbradley/First-Car-Shooter
 4.2 - Desarrollar mundo de VideoPoints con Stars
 4.3 - Desarrollar juego de carrera de coches con checkpoint
