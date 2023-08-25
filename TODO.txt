@@ -1,3 +1,10 @@
+/*
+ NOTA IMPORTANTE: A chuparla este proyecto porque da muchos problemas en su despliegue,
+ Se utilizara como template First-Car-Shooter de sean bradley y de ahi añadire sketchbook.
+
+ https://sbcode.net/tssock/game-overview/
+*/
+
 1 - Instalar y usar nvm (https://tecadmin.net/install-nvm-macos-with-homebrew/)
 2 - Arrancar el proyecto
 3 - Actualizar las versiones de threejs y cannonjs
