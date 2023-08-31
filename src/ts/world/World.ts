@@ -64,6 +64,8 @@ export class World {
   public scenarioGUIFolder: any;
   public updatables: IUpdatable[] = [];
 
+  public characterPlayer: Character;
+
   private lastScenarioID: string;
 
   constructor(worldScenePath?: any) {
