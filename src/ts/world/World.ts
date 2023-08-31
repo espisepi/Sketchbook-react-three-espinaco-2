@@ -673,31 +673,38 @@ export class World {
     // console.log(surnameTarget)
     // console.log(this.characters)
 
-    if (positionTarget) {
-      this.characters.forEach((character: Character) => {
-        if (character.name.includes(surnameTarget)) {
-          // console.log('ENCONTRADO! :)')ç
-          // Con el position no se mueve un character ya que utiliza fisicas
-          // character.position.set(
-          //     positionTarget.x,
-          //     positionTarget.y,
-          //     positionTarget.z
-          // )
+    this.characters.forEach((character: Character) => {
+      if (character.name.includes(surnameTarget)) {
+        // Disabled physics of character si no lo esta
+        if (character.getPhysicsEnabled) {
+          character.setPhysicsEnabled(false);
+        }
+
+        if (positionTarget) {
+          // Update position character
           character.setPosition(
             positionTarget.x,
             positionTarget.y,
             positionTarget.z
           );
-          if (character.getPhysicsEnabled) {
-            character.setPhysicsEnabled(false);
-          }
-          // character.characterCapsule.body.position.set(
-          //     positionTarget.x,
-          //     positionTarget.y,
-          //     positionTarget.z
-          // )
         }
-      });
-    }
+
+        if (quaternionTarget) {
+          // Update quaternion character
+          character.quaternion.set(
+            quaternionTarget.x,
+            quaternionTarget.y,
+            quaternionTarget.z,
+            quaternionTarget.w
+          );
+        }
+
+        // character.characterCapsule.body.position.set(
+        //     positionTarget.x,
+        //     positionTarget.y,
+        //     positionTarget.z
+        // )
+      }
+    });
   }
 }
