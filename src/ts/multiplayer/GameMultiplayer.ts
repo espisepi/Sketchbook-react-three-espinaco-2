@@ -81,6 +81,12 @@ export class GameMultiplayer {
       }, 50);
     });
 
+    this.socket.on("removePlayer", (p: string) => {
+      console.log("deleting player " + p);
+      this.players[p]?.removeFromWorld(this.world);
+      delete this.players[p];
+    });
+
     this.socket.on("gameData", (gameData: any) => {
       Object.keys(gameData.players).forEach((p) => {
         if (p !== this.myId) {
@@ -91,6 +97,7 @@ export class GameMultiplayer {
 
             const character = this.world.getCharacterByName(surname);
             if (character) {
+              console.warn("Character encontrado!!! =======", { character });
               this.players[p] = character;
             } else {
               this.world.spawnNewPlayerCharacter(surname);

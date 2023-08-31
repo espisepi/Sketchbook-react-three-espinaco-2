@@ -633,7 +633,8 @@ export class World {
       // let forward = Utils.getForward(this.object)
       // player.setOrientation(forward, true)
       this.add(player);
-      // player.takeControl()
+      // this.characters.push(player); // no deberia porque ya lo hace el new Character()
+      // playerx.takeControl()
     });
   }
 
