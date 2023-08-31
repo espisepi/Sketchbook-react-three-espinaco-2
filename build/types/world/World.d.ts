@@ -1,18 +1,18 @@
-import * as THREE from 'three';
-import * as CANNON from 'cannon';
-import { CameraOperator } from '../core/CameraOperator';
-import { Stats } from '../../lib/utils/Stats';
-import { CannonDebugRenderer } from '../../lib/cannon/CannonDebugRenderer';
-import { InputManager } from '../core/InputManager';
-import { LoadingManager } from '../core/LoadingManager';
-import { InfoStack } from '../core/InfoStack';
-import { IWorldEntity } from '../interfaces/IWorldEntity';
-import { IUpdatable } from '../interfaces/IUpdatable';
-import { Character } from '../characters/Character';
-import { Path } from './Path';
-import { Vehicle } from '../vehicles/Vehicle';
-import { Scenario } from './Scenario';
-import { Sky } from './Sky';
+import * as THREE from "three";
+import * as CANNON from "cannon";
+import { CameraOperator } from "../core/CameraOperator";
+import { Stats } from "../../lib/utils/Stats";
+import { CannonDebugRenderer } from "../../lib/cannon/CannonDebugRenderer";
+import { InputManager } from "../core/InputManager";
+import { LoadingManager } from "../core/LoadingManager";
+import { InfoStack } from "../core/InfoStack";
+import { IWorldEntity } from "../interfaces/IWorldEntity";
+import { IUpdatable } from "../interfaces/IUpdatable";
+import { Character } from "../characters/Character";
+import { Path } from "./Path";
+import { Vehicle } from "../vehicles/Vehicle";
+import { Scenario } from "./Scenario";
+import { Sky } from "./Sky";
 export declare class World {
     renderer: THREE.WebGLRenderer;
     camera: THREE.PerspectiveCamera;
@@ -43,6 +43,8 @@ export declare class World {
     paths: Path[];
     scenarioGUIFolder: any;
     updatables: IUpdatable[];
+    characterPlayer: Character;
+    loadingManager: LoadingManager;
     private lastScenarioID;
     constructor(worldScenePath?: any);
     update(timeStep: number, unscaledTimeStep: number): void;
@@ -69,4 +71,8 @@ export declare class World {
     updateControls(controls: any): void;
     private generateHTML;
     private createParamsGUI;
+    spawnNewPlayerCharacter(nameCharacter: string): void;
+    getCharacterByName(surnamePlayer: string): Character | null;
+    removeTarget(surnamePlayer: string): void;
+    updateTargets(data: any): void;
 }
