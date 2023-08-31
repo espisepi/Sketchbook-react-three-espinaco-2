@@ -31,6 +31,7 @@ import { Vehicle } from "../vehicles/Vehicle";
 import { Scenario } from "./Scenario";
 import { Sky } from "./Sky";
 import { Ocean } from "./Ocean";
+import { GameMultiplayer } from "../multiplayer/GameMultiplayer";
 
 export class World {
   public renderer: THREE.WebGLRenderer;
@@ -67,6 +68,8 @@ export class World {
 
   constructor(worldScenePath?: any) {
     const scope = this;
+
+    const gameMultiplayer = new GameMultiplayer(this);
 
     console.log("world Sketchbook: ", { world: this });
 

@@ -16,5 +16,11 @@ module.exports = merge(common, {
       directory: path.join(__dirname, ""),
     },
     hot: true,
+    proxy: {
+      "/socket.io": {
+        target: "http://127.0.0.1:3000",
+        ws: true,
+      },
+    },
   },
 });
