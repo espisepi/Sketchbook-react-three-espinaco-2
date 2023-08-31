@@ -40,8 +40,8 @@ export class GameMultiplayer {
       this.updateInterval = setInterval(() => {
         this.socket.emit("update", {
           t: Date.now(),
-          p: this.world.characterPlayer?.position,
-          q: this.world.characterPlayer?.quaternion,
+          p: this.world?.characterPlayer?.characterCapsule?.body?.position,
+          q: this.world?.characterPlayer?.quaternion,
           v: null,
           tp: null,
           tq: null,
