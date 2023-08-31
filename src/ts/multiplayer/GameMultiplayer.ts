@@ -80,5 +80,32 @@ export class GameMultiplayer {
         });
       }, 50);
     });
+
+    this.socket.on("gameData", (gameData: any) => {
+      Object.keys(gameData.players).forEach((p) => {
+        if (p !== this.myId) {
+          if (!this.players[p]) {
+            console.log("adding player " + p);
+
+            const surname = gameData.players[p].sn;
+
+            const character = this.world.getCharacterByName(surname);
+            if (character) {
+              this.players[p] = character;
+            } else {
+              this.world.spawnNewPlayerCharacter(surname);
+              console.warn(
+                "Error al encontrar el character, se crea de nuevo!!! ======",
+                {
+                  surname,
+                }
+              );
+            }
+            this.world.updateTargets(gameData.players[p]);
+          }
+          this.world.updateTargets(gameData.players[p]);
+        }
+      });
+    });
   }
 }

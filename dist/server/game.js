@@ -47,6 +47,11 @@ class Game {
                 }
             });
         });
+        setInterval(() => {
+            this.io.emit("gameData", {
+                players: this.players,
+            });
+        }, 50);
     }
 }
 exports.default = Game;

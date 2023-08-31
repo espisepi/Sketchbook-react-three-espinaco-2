@@ -53,5 +53,11 @@ export default class Game {
         }
       });
     });
+
+    setInterval(() => {
+      this.io.emit("gameData", {
+        players: this.players,
+      });
+    }, 50);
   }
 }

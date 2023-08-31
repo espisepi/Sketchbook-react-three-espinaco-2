@@ -32,6 +32,7 @@ import { Scenario } from "./Scenario";
 import { Sky } from "./Sky";
 import { Ocean } from "./Ocean";
 import { GameMultiplayer } from "../multiplayer/GameMultiplayer";
+import { CharacterSpawnPoint } from "./CharacterSpawnPoint";
 
 export class World {
   public renderer: THREE.WebGLRenderer;
@@ -64,7 +65,9 @@ export class World {
   public scenarioGUIFolder: any;
   public updatables: IUpdatable[] = [];
 
+  // sepinaco Multiplayer
   public characterPlayer: Character;
+  public loadingManager: LoadingManager;
 
   private lastScenarioID: string;
 
@@ -176,6 +179,7 @@ export class World {
     // Load scene if path is supplied
     if (worldScenePath !== undefined) {
       let loadingManager = new LoadingManager(this);
+      this.loadingManager = loadingManager;
       loadingManager.onFinishedCallback = () => {
         this.update(1, 1);
         this.setTimeScale(1);
@@ -615,5 +619,80 @@ export class World {
     });
 
     gui.open();
+  }
+
+  // Multiplayer Methods ====================
+  // Multiplayer Methods below =============================================
+
+  public spawnNewPlayerCharacter(nameCharacter: string) {
+    this.loadingManager?.loadGLTF("build/assets/boxman.glb", (model) => {
+      let player = new Character(model, nameCharacter);
+      // let worldPos = new THREE.Vector3()
+      // this.object.getWorldPosition(worldPos)
+      // player.setPosition(worldPos.x, worldPos.y, worldPos.z)
+      // let forward = Utils.getForward(this.object)
+      // player.setOrientation(forward, true)
+      this.add(player);
+      // player.takeControl()
+    });
+  }
+
+  getCharacterByName(surnamePlayer: string): Character | null {
+    const [character] = this.characters.filter((character: Character) =>
+      character.name.includes(surnamePlayer)
+    );
+    return character;
+  }
+
+  removeTarget(surnamePlayer: string) {
+    const character = this.getCharacterByName(surnamePlayer);
+
+    if (character) {
+      console.warn("Character finder to remove!!!! =====: ", {
+        characterFinder: character,
+        characters: this.characters,
+        surnamePlayer,
+      });
+      character.removeFromWorld(this);
+    } else {
+      console.error("Character not finder to remove! ============", {
+        characterFinder: character,
+        characters: this.characters,
+        surnamePlayer,
+      });
+    }
+  }
+
+  updateTargets(data: any) {
+    const surnameTarget = data.sn;
+    const positionTarget = data.p;
+    const quaternionTarget = data.q;
+
+    // console.log(surnameTarget)
+    // console.log(this.characters)
+
+    if (positionTarget) {
+      this.characters.forEach((character: Character) => {
+        if (character.name.includes(surnameTarget)) {
+          // console.log('ENCONTRADO! :)')ç
+          // Con el position no se mueve un character ya que utiliza fisicas
+          // character.position.set(
+          //     positionTarget.x,
+          //     positionTarget.y,
+          //     positionTarget.z
+          // )
+          character.setPosition(
+            positionTarget.x,
+            positionTarget.y,
+            positionTarget.z
+          );
+          // character.characterCapsule.body.position.set(
+          //     positionTarget.x,
+          //     positionTarget.y,
+          //     positionTarget.z
+          // )
+        }
+      });
+    }
   }
 }
