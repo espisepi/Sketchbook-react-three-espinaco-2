@@ -41,7 +41,7 @@ export class GameMultiplayer {
         this.socket.emit("update", {
           t: Date.now(),
           p: this.world?.characterPlayer?.characterCapsule?.body?.position,
-          q: this.world?.characterPlayer?.quaternion,
+          q: null,
           v: null,
           tp: null,
           tq: null,
