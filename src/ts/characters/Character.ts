@@ -261,6 +261,10 @@ export class Character extends THREE.Object3D implements IWorldEntity {
     this.behaviour = behaviour;
   }
 
+  public getPhysicsEnabled(): boolean {
+    return this.physicsEnabled;
+  }
+
   public setPhysicsEnabled(value: boolean): void {
     this.physicsEnabled = value;
 

@@ -626,15 +626,16 @@ export class World {
 
   public spawnNewPlayerCharacter(nameCharacter: string) {
     this.loadingManager?.loadGLTF("build/assets/boxman.glb", (model) => {
+      // Create character
       let player = new Character(model, nameCharacter);
-      // let worldPos = new THREE.Vector3()
-      // this.object.getWorldPosition(worldPos)
-      // player.setPosition(worldPos.x, worldPos.y, worldPos.z)
-      // let forward = Utils.getForward(this.object)
-      // player.setOrientation(forward, true)
+
+      // Disabled physics
+      // Habria que hacerlo pero falla porque world no esta creado
+      // Lo hacemos por lo tanto en el metodo updateTargets que se ejecuta muchas veces durante el juego
+      // player.setPhysicsEnabled(false);
+
+      // Add to world
       this.add(player);
-      // this.characters.push(player); // no deberia porque ya lo hace el new Character()
-      // playerx.takeControl()
     });
   }
 
@@ -687,6 +688,9 @@ export class World {
             positionTarget.y,
             positionTarget.z
           );
+          if (character.getPhysicsEnabled) {
+            character.setPhysicsEnabled(false);
+          }
           // character.characterCapsule.body.position.set(
           //     positionTarget.x,
           //     positionTarget.y,
