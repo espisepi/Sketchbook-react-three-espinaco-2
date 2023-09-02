@@ -356,7 +356,8 @@ export class World {
           this.sky.csm.setupMaterial(child.material);
 
           if (child.material.name === "ocean") {
-            this.registerUpdatable(new Ocean(child, this));
+            // sepinaco comment: Remove Ocean for perfomance reasons
+            // this.registerUpdatable(new Ocean(child, this));
           }
         }
 
