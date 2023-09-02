@@ -1,4 +1,4 @@
-import { World } from '../../../ts/sketchbook';
+import { World } from "../../../ts/sketchbook";
 interface Control {
     desc: String;
     keys: Array<String>;
