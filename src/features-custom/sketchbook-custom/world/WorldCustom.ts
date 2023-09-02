@@ -24,7 +24,7 @@ export class WorldCustom extends World {
 
   constructor(worldScenePath?: any) {
     super(worldScenePath);
-    // console.log("OYEEEEEEEEEEEEE");
+    console.log("OYEEEEEEEEEEEEE");
   }
 
   public updateControls(controls: Array<Control>): void {
