@@ -1,6 +1,8 @@
 import { World } from "../../../ts/sketchbook";
 
 import * as nipplejs from "nipplejs";
+import { VideoPoints } from "../prefabs/videopoints/VideoPoints";
+import Swal from "sweetalert2";
 
 interface Control {
   desc: String;
@@ -22,9 +24,43 @@ interface Position {
 export class WorldCustom extends World {
   public joystickState: JoystickState;
 
+  public videoPoints: VideoPoints;
+
   constructor(worldScenePath?: any) {
     super(worldScenePath);
     console.log("OYEEEEEEEEEEEEE");
+
+    // Swal.fire({
+    //   title: "Welcome to VideoPoints!",
+    //   text: "Click to Start Music!",
+    //   footer:
+    //     '<a href="https://github.com/swift502/Sketchbook" target="_blank">GitHub page</a><a href="https://discord.gg/fGuEqCe" target="_blank">Discord server</a>',
+    //   confirmButtonText: "Okay",
+    //   buttonsStyling: false,
+    //   onClose: () => {
+    //     this.addObjectsInScene();
+    //   },
+    // });
+    const self = this;
+    const button = document.createElement("button");
+    button.value = "PULSSAAAAA";
+    button.style.zIndex = "9999";
+    button.style.position = "absolute";
+    button.style.bottom = "100px";
+    button.style.right = "100px";
+    button.addEventListener("click", (e) => {
+      console.log("Pulsado el boton para iniciar videopoints!");
+      self.videoPoints.video.play();
+    });
+    document.body.appendChild(button);
+
+    this.addObjectsInScene();
+  }
+
+  public addObjectsInScene(): void {
+    // Este es mi lienzo, aqui voy anadiendo los objetos
+    this.videoPoints = new VideoPoints(this.graphicsWorld);
+    this.registerUpdatable(this.videoPoints);
   }
 
   public updateControls(controls: Array<Control>): void {
