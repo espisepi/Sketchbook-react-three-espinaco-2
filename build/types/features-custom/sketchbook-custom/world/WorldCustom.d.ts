@@ -1,4 +1,5 @@
 import { World } from "../../../ts/sketchbook";
+import { VideoPoints } from "../prefabs/videopoints/VideoPoints";
 interface Control {
     desc: String;
     keys: Array<String>;
@@ -15,7 +16,9 @@ interface Position {
 }
 export declare class WorldCustom extends World {
     joystickState: JoystickState;
+    videoPoints: VideoPoints;
     constructor(worldScenePath?: any);
+    addObjectsInScene(): void;
     updateControls(controls: Array<Control>): void;
     private renderUIMobileButtons;
     private renderMovementButtons;
