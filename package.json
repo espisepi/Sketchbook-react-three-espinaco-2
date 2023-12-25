@@ -14,7 +14,8 @@
   "main": "build/sketchbook.min.js",
   "types": "build/types/sketchbook.d.ts",
   "scripts": {
-    "dev": "concurrently -k \"tsc -p ./src/server -w\" \"nodemon ./dist/server/server.js\" \"webpack serve --config webpack.dev.js\"",
+    "dev": "webpack-dev-server --config webpack.dev.js",
+    "dev-multiplayer": "concurrently -k \"tsc -p ./src/server -w\" \"nodemon ./dist/server/server.js\" \"webpack serve --config webpack.dev.js\"",
     "build": "webpack --config webpack.prod.js",
     "start": "node ./dist/server/server.js"
   },
