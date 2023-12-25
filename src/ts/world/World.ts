@@ -71,12 +71,17 @@ export class World {
 
   private lastScenarioID: string;
 
-  constructor(worldScenePath?: any) {
+  constructor(worldScenePath?: any, isMultiplayer: boolean = false) {
     const scope = this;
 
-    const gameMultiplayer = new GameMultiplayer(this);
+    if (isMultiplayer) {
+      const gameMultiplayer = new GameMultiplayer(this);
+    }
 
-    console.log("world Sketchbook: ", { world: this });
+    console.log("world Sketchbook: ", {
+      world: this,
+      isMultiplayer: isMultiplayer,
+    });
 
     // WebGL not supported
     if (!Detector.webgl) {

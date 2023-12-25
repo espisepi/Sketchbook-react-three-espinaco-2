@@ -46,7 +46,7 @@ export declare class World {
     characterPlayer: Character;
     loadingManager: LoadingManager;
     private lastScenarioID;
-    constructor(worldScenePath?: any);
+    constructor(worldScenePath?: any, isMultiplayer?: boolean);
     update(timeStep: number, unscaledTimeStep: number): void;
     updatePhysics(timeStep: number): void;
     isOutOfBounds(position: CANNON.Vec3): boolean;
