@@ -15,10 +15,13 @@
 4.2 - Desarrollar mundo de VideoPoints con Stars
 4.3 - Desarrollar juego de carrera de coches con checkpoint
 4.4 - Mejorar la UI de Mobile para que aparezca y desaparezca
+4.5 - Mejorar la UI de Desktop
 
 5 - Con el curso de udemy de juegos en html5, meterle dentro un minijuego
 (por ejemplo tetris) y cuando termine el juego dejar el escenario 3D para poder
 visitarlo con Sketchbook
+
+6 - Hacer experencia visual con avion primera persona y instancedmeshes voxel texture videoclip
 
 
 ======
