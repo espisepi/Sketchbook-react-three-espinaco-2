@@ -44,3 +44,8 @@ visitarlo con Sketchbook
 
 // - Add many big Scenes with this technique: https://threejs.org/manual/#en/voxel-geometry
 // - With the before technique, add videoclip texture voxel trambolic scene
+
+
+// TODO In Progress:
+
+- Realizar checkpoint (objeto en blender con ese atributo) y escena espacial (Realizar toda la escena en blender y los detalles los añadimos en threejs (como las estrellas))
