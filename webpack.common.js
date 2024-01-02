@@ -39,4 +39,7 @@ module.exports = {
   performance: {
     hints: false,
   },
+  optimization: {
+    minimize: false, // Deshabilita la minimización
+  },
 };

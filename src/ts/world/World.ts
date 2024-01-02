@@ -541,6 +541,7 @@ export class World {
     // Canvas
     document.body.appendChild(this.renderer.domElement);
     this.renderer.domElement.id = "canvas";
+    this.renderer.domElement.classList.add("canvas-sketchbook");
   }
 
   private createParamsGUI(scope: World): void {

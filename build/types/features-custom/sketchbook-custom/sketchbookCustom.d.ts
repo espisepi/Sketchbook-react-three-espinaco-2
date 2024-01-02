@@ -1,1 +1,1 @@
-export { WorldCustom as World } from './world/WorldCustom';
+export { WorldCustom as World } from "./world/WorldCustom";
