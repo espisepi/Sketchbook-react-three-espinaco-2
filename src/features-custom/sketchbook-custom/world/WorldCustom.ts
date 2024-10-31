@@ -3,6 +3,7 @@ import { World } from "../../../ts/sketchbook";
 import * as nipplejs from "nipplejs";
 import { VideoPoints } from "../prefabs/videopoints/VideoPoints";
 import Swal from "sweetalert2";
+import { HorseScene } from "../scenes/horse-scene/HorseScene";
 
 interface Control {
   desc: String;
@@ -59,8 +60,15 @@ export class WorldCustom extends World {
 
   public addObjectsInScene(): void {
     // Este es mi lienzo, aqui voy anadiendo los objetos
+
+    // Add VideoPoints
     this.videoPoints = new VideoPoints(this.graphicsWorld);
     this.registerUpdatable(this.videoPoints);
+
+    // Add HorseScene
+    const horseScene = new HorseScene(this.graphicsWorld, this.loadingManager);
+    this.registerUpdatable(horseScene);
+
   }
 
   public updateControls(controls: Array<Control>): void {
