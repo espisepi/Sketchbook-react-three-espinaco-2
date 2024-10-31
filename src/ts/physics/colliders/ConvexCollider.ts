@@ -30,7 +30,8 @@ export class ConvexCollider implements ICollider
 
 		if (this.mesh.geometry.isBufferGeometry)
 		{
-			this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
+			this.mesh.geometry = this.mesh.geometry.clone(); // Clonar la BufferGeometry
+			// this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
 		}
 
 		let cannonPoints = this.mesh.geometry.vertices.map((v: Vector3) => {

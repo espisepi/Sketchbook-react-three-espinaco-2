@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import { World } from "../../../ts/sketchbook";
 
 import * as nipplejs from "nipplejs";
@@ -55,7 +57,23 @@ export class WorldCustom extends World {
     });
     document.body.appendChild(button);
 
+    this.initLights();
     this.addObjectsInScene();
+  }
+
+  private initLights(): void {
+    // Ambient light
+		const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.0 );
+		// this.refreshHemiIntensity();
+		hemiLight.color.setHSL( 0.59, 0.4, 0.6 );
+		hemiLight.groundColor.setHSL( 0.095, 0.2, 0.75 );
+		hemiLight.position.set( 0, 50, 0 );
+		this.graphicsWorld.add( hemiLight );
+
+    const ambientLight = new THREE.AmbientLight(new THREE.Color('white'), 2.0);
+    this.graphicsWorld.add( ambientLight );
+
+
   }
 
   public addObjectsInScene(): void {
@@ -66,8 +84,8 @@ export class WorldCustom extends World {
     this.registerUpdatable(this.videoPoints);
 
     // Add HorseScene
-    const horseScene = new HorseScene(this.graphicsWorld, this.loadingManager);
-    this.registerUpdatable(horseScene);
+    // const horseScene = new HorseScene(this.graphicsWorld, this.loadingManager);
+    // this.registerUpdatable(horseScene);
 
   }
 

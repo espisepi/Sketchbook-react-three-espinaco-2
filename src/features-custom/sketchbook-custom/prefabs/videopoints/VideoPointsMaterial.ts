@@ -4,20 +4,20 @@ export default class VideoPointsMaterial extends THREE.ShaderMaterial {
   constructor() {
     super({
       uniforms: {
-        iTime: { type: "f", value: 0 },
+        iTime: { value: 0 },
         iResolution: { value: new THREE.Vector3(1, 1, 1) },
 
-        bass: { type: "f", value: 0.0 },
-        mid: { type: "f", value: 0.0 },
-        treble: { type: "f", value: 0.0 },
+        bass: { value: 0.0 },
+        mid: { value: 0.0 },
+        treble: { value: 0.0 },
 
-        pointSize: { type: "f", value: 1.5 },
+        pointSize: { value: 1.5 },
 
-        amplitudeDistance: { type: "f", value: 1.0 },
+        amplitudeDistance: { value: 1.0 },
 
         colorInput: { value: new THREE.Vector3(0, 0, 0) },
 
-        iChannel0: { type: "t", value: undefined }, // THREE.Texture
+        iChannel0: { value: undefined }, // THREE.Texture
       },
       vertexShader: `
       varying vec2 vUv;

@@ -79,7 +79,9 @@ export class ExitingVehicle extends ExitingStateBase
 
 			// Rotation
 			this.updateEndRotation();
-			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, smoothFactor);
+			// THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, smoothFactor);
+			this.character.quaternion.copy(this.startRotation.clone().slerp(this.endRotation, smoothFactor));
+
 		}
 	}
 }

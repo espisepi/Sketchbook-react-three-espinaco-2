@@ -4,7 +4,7 @@ import { SimulationFrame } from '../physics/spring_simulation/SimulationFrame';
 import { Side } from '../enums/Side';
 import { Object3D } from 'three';
 import { Space } from '../enums/Space';
-export declare function createCapsuleGeometry(radius?: number, height?: number, N?: number): THREE.Geometry;
+export declare function createCapsuleGeometry(radius?: number, height?: number, N?: number): THREE.BufferGeometry;
 /**
  * Constructs a 2D matrix from first vector, replacing the Y axes with the global Y axis,
  * and applies this matrix to the second vector. Saves performance when compared to full 3D matrix application.

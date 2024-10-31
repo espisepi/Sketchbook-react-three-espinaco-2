@@ -39,6 +39,7 @@
  */
 
  import * as THREE from 'three';
+ import { Face3 } from './Face3';
 
 export const quickhull = (function(){
 
@@ -440,7 +441,7 @@ export const quickhull = (function(){
 
     var ll = faces.length;
     while( ll-- > 0 ){
-      geometry.faces[ll] = new THREE.Face3( faces[ll][2], faces[ll][1], faces[ll][0], faces[ll].normal )
+      geometry.faces[ll] = new Face3( faces[ll][2], faces[ll][1], faces[ll][0], faces[ll].normal )
     }
 
     geometry.normalsNeedUpdate = true;

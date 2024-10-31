@@ -179,7 +179,7 @@ export class World {
       this.camera,
       this.params.Mouse_Sensitivity
     );
-    this.sky = new Sky(this);
+    // this.sky = new Sky(this);
 
     // Load scene if path is supplied
     if (worldScenePath !== undefined) {
@@ -358,7 +358,7 @@ export class World {
       if (child.hasOwnProperty("userData")) {
         if (child.type === "Mesh") {
           Utils.setupMeshProperties(child);
-          this.sky.csm.setupMaterial(child.material);
+          // this.sky.csm.setupMaterial(child.material);
 
           if (child.material.name === "ocean") {
             // sepinaco comment: Remove Ocean for perfomance reasons
@@ -589,13 +589,13 @@ export class World {
     settingsFolder.add(this.params, "FXAA");
     settingsFolder.add(this.params, "Shadows").onChange((enabled) => {
       if (enabled) {
-        this.sky.csm.lights.forEach((light) => {
-          light.castShadow = true;
-        });
+        // this.sky.csm.lights.forEach((light) => {
+        //   light.castShadow = true;
+        // });
       } else {
-        this.sky.csm.lights.forEach((light) => {
-          light.castShadow = false;
-        });
+        // this.sky.csm.lights.forEach((light) => {
+        //   light.castShadow = false;
+        // });
       }
     });
     settingsFolder.add(this.params, "Pointer_Lock").onChange((enabled) => {

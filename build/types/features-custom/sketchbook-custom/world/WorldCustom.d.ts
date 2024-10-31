@@ -18,6 +18,7 @@ export declare class WorldCustom extends World {
     joystickState: JoystickState;
     videoPoints: VideoPoints;
     constructor(worldScenePath?: any);
+    private initLights;
     addObjectsInScene(): void;
     updateControls(controls: Array<Control>): void;
     private renderUIMobileButtons;

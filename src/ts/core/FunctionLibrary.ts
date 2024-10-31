@@ -7,110 +7,178 @@ import { Side } from '../enums/Side';
 import { Object3D } from 'three';
 import { Space } from '../enums/Space';
 
-export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
-{
-	const geometry = new THREE.Geometry();
-	const TWOPI = Math.PI * 2;
-	const PID2 = 1.570796326794896619231322;
+// export function createCapsuleGeometry(radius: number = 1, height: number = 2, N: number = 32): THREE.Geometry
+// {
+// 	const geometry = new THREE.Geometry();
+// 	const TWOPI = Math.PI * 2;
+// 	const PID2 = 1.570796326794896619231322;
 
-	const normals = [];
+// 	const normals = [];
 
-	// top cap
-	for (let i = 0; i <= N / 4; i++)
-	{
-		for (let j = 0; j <= N; j++)
-		{
-			let theta = j * TWOPI / N;
-			let phi = -PID2 + Math.PI * i / (N / 2);
-			let vertex = new THREE.Vector3();
-			let normal = new THREE.Vector3();
-			vertex.x = radius * Math.cos(phi) * Math.cos(theta);
-			vertex.y = radius * Math.cos(phi) * Math.sin(theta);
-			vertex.z = radius * Math.sin(phi);
-			vertex.z -= height / 2;
-			normal.x = vertex.x;
-			normal.y = vertex.y;
-			normal.z = vertex.z;
-			geometry.vertices.push(vertex);
-			normals.push(normal);
-		}
-	}
+// 	// top cap
+// 	for (let i = 0; i <= N / 4; i++)
+// 	{
+// 		for (let j = 0; j <= N; j++)
+// 		{
+// 			let theta = j * TWOPI / N;
+// 			let phi = -PID2 + Math.PI * i / (N / 2);
+// 			let vertex = new THREE.Vector3();
+// 			let normal = new THREE.Vector3();
+// 			vertex.x = radius * Math.cos(phi) * Math.cos(theta);
+// 			vertex.y = radius * Math.cos(phi) * Math.sin(theta);
+// 			vertex.z = radius * Math.sin(phi);
+// 			vertex.z -= height / 2;
+// 			normal.x = vertex.x;
+// 			normal.y = vertex.y;
+// 			normal.z = vertex.z;
+// 			geometry.vertices.push(vertex);
+// 			normals.push(normal);
+// 		}
+// 	}
 
-	// bottom cap
-	for (let i = N / 4; i <= N / 2; i++)
-	{
-		for (let j = 0; j <= N; j++)
-		{
-			let theta = j * TWOPI / N;
-			let phi = -PID2 + Math.PI * i / (N / 2);
-			let vertex = new THREE.Vector3();
-			let normal = new THREE.Vector3();
-			vertex.x = radius * Math.cos(phi) * Math.cos(theta);
-			vertex.y = radius * Math.cos(phi) * Math.sin(theta);
-			vertex.z = radius * Math.sin(phi);
-			vertex.z += height / 2;
-			normal.x = vertex.x;
-			normal.y = vertex.y;
-			normal.z = vertex.z;
-			geometry.vertices.push(vertex);
-			normals.push(normal);
-		}
-	}
+// 	// bottom cap
+// 	for (let i = N / 4; i <= N / 2; i++)
+// 	{
+// 		for (let j = 0; j <= N; j++)
+// 		{
+// 			let theta = j * TWOPI / N;
+// 			let phi = -PID2 + Math.PI * i / (N / 2);
+// 			let vertex = new THREE.Vector3();
+// 			let normal = new THREE.Vector3();
+// 			vertex.x = radius * Math.cos(phi) * Math.cos(theta);
+// 			vertex.y = radius * Math.cos(phi) * Math.sin(theta);
+// 			vertex.z = radius * Math.sin(phi);
+// 			vertex.z += height / 2;
+// 			normal.x = vertex.x;
+// 			normal.y = vertex.y;
+// 			normal.z = vertex.z;
+// 			geometry.vertices.push(vertex);
+// 			normals.push(normal);
+// 		}
+// 	}
 
-	for (let i = 0; i <= N / 2; i++)
-	{
-		for (let j = 0; j < N; j++)
-		{
-			let vec = new THREE.Vector4(
-				i * (N + 1) + j,
-				i * (N + 1) + (j + 1),
-				(i + 1) * (N + 1) + (j + 1),
-				(i + 1) * (N + 1) + j
-			);
+// 	for (let i = 0; i <= N / 2; i++)
+// 	{
+// 		for (let j = 0; j < N; j++)
+// 		{
+// 			let vec = new THREE.Vector4(
+// 				i * (N + 1) + j,
+// 				i * (N + 1) + (j + 1),
+// 				(i + 1) * (N + 1) + (j + 1),
+// 				(i + 1) * (N + 1) + j
+// 			);
 
-			if (i === N / 4)
-			{
-				let face1 = new THREE.Face3(vec.x, vec.y, vec.z, [
-					normals[vec.x],
-					normals[vec.y],
-					normals[vec.z]
-				]);
+// 			if (i === N / 4)
+// 			{
+// 				let face1 = new THREE.Face3(vec.x, vec.y, vec.z, [
+// 					normals[vec.x],
+// 					normals[vec.y],
+// 					normals[vec.z]
+// 				]);
 
-				let face2 = new THREE.Face3(vec.x, vec.z, vec.w, [
-					normals[vec.x],
-					normals[vec.z],
-					normals[vec.w]
-				]);
+// 				let face2 = new THREE.Face3(vec.x, vec.z, vec.w, [
+// 					normals[vec.x],
+// 					normals[vec.z],
+// 					normals[vec.w]
+// 				]);
 
-				geometry.faces.push(face2);
-				geometry.faces.push(face1);
-			} else
-			{
-				let face1 = new THREE.Face3(vec.x, vec.y, vec.z, [
-					normals[vec.x],
-					normals[vec.y],
-					normals[vec.z]
-				]);
+// 				geometry.faces.push(face2);
+// 				geometry.faces.push(face1);
+// 			} else
+// 			{
+// 				let face1 = new THREE.Face3(vec.x, vec.y, vec.z, [
+// 					normals[vec.x],
+// 					normals[vec.y],
+// 					normals[vec.z]
+// 				]);
 
-				let face2 = new THREE.Face3(vec.x, vec.z, vec.w, [
-					normals[vec.x],
-					normals[vec.z],
-					normals[vec.w]
-				]);
+// 				let face2 = new THREE.Face3(vec.x, vec.z, vec.w, [
+// 					normals[vec.x],
+// 					normals[vec.z],
+// 					normals[vec.w]
+// 				]);
 
-				geometry.faces.push(face1);
-				geometry.faces.push(face2);
-			}
-		}
-		// if(i==(N/4)) break; // N/4 is when the center segments are solved
-	}
+// 				geometry.faces.push(face1);
+// 				geometry.faces.push(face2);
+// 			}
+// 		}
+// 		// if(i==(N/4)) break; // N/4 is when the center segments are solved
+// 	}
 
-	geometry.rotateX(Math.PI / 2);
-	geometry.computeVertexNormals();
-	geometry.computeFaceNormals();
+// 	geometry.rotateX(Math.PI / 2);
+// 	geometry.computeVertexNormals();
+// 	geometry.computeFaceNormals();
 
-	return geometry;
+// 	return geometry;
+// }
+
+export function createCapsuleGeometry(
+  radius: number = 1,
+  height: number = 2,
+  N: number = 32
+): THREE.BufferGeometry {
+  const geometry = new THREE.BufferGeometry();
+  const TWOPI = Math.PI * 2;
+  const PID2 = Math.PI / 2;
+
+  const vertices = [];
+  const normals = [];
+  const indices = [];
+
+  // Top cap
+  for (let i = 0; i <= N / 4; i++) {
+    for (let j = 0; j <= N; j++) {
+      const theta = (j * TWOPI) / N;
+      const phi = -PID2 + (Math.PI * i) / (N / 2);
+
+      const x = radius * Math.cos(phi) * Math.cos(theta);
+      const y = radius * Math.cos(phi) * Math.sin(theta);
+      const z = radius * Math.sin(phi) - height / 2;
+
+      vertices.push(x, y, z);
+      normals.push(x, y, z);
+    }
+  }
+
+  // Bottom cap
+  for (let i = N / 4; i <= N / 2; i++) {
+    for (let j = 0; j <= N; j++) {
+      const theta = (j * TWOPI) / N;
+      const phi = -PID2 + (Math.PI * i) / (N / 2);
+
+      const x = radius * Math.cos(phi) * Math.cos(theta);
+      const y = radius * Math.cos(phi) * Math.sin(theta);
+      const z = radius * Math.sin(phi) + height / 2;
+
+      vertices.push(x, y, z);
+      normals.push(x, y, z);
+    }
+  }
+
+  // Build indices for faces
+  for (let i = 0; i < N / 2; i++) {
+    for (let j = 0; j < N; j++) {
+      const a = i * (N + 1) + j;
+      const b = i * (N + 1) + (j + 1);
+      const c = (i + 1) * (N + 1) + (j + 1);
+      const d = (i + 1) * (N + 1) + j;
+
+      // Create two faces (triangles) per quad
+      indices.push(a, b, c);
+      indices.push(a, c, d);
+    }
+  }
+
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setIndex(indices);
+
+  geometry.rotateX(Math.PI / 2);
+  geometry.computeVertexNormals();
+
+  return geometry;
 }
+
 
 //#endregion
 
@@ -284,7 +352,7 @@ export function setupMeshProperties(child: any): void
 		mat.map.anisotropy = 4;
 		mat.aoMap = child.material.aoMap;
 		mat.transparent = child.material.transparent;
-		mat.skinning = child.material.skinning;
+		// mat.skinning = child.material.skinning;
 		// mat.map.encoding = THREE.LinearEncoding;
 		child.material = mat;
 	}

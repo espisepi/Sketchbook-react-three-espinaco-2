@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import { quickhull } from './THREE.quickhull';
+import { CustomGeometry } from './CustomGeometry';
 
 var PI_2 = Math.PI / 2;
 
@@ -74,7 +75,7 @@ threeToCannon.Type = Type;
  */
 
  /**
-  * @param  {THREE.Geometry} geometry
+  * @param  {CustomGeometry} geometry
   * @return {CANNON.Shape}
   */
  function createBoxShape (geometry) {
@@ -160,7 +161,7 @@ function createConvexPolyhedron (object) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {CustomGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createCylinderShape (geometry) {
@@ -183,7 +184,7 @@ function createCylinderShape (geometry) {
   shape.numSegments = params.radialSegments;
 
   shape.orientation = new CANNON.Quaternion();
-  shape.orientation.setFromEuler(THREE.Math.degToRad(90), 0, 0, 'XYZ').normalize();
+  shape.orientation.setFromEuler(THREE.MathUtils.degToRad(90), 0, 0, 'XYZ').normalize();
   return shape;
 }
 
@@ -230,7 +231,7 @@ function createBoundingCylinderShape (object, options) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {CustomGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createPlaneShape (geometry) {
@@ -244,7 +245,7 @@ function createPlaneShape (geometry) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {CustomGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createSphereShape (geometry) {
@@ -269,7 +270,7 @@ function createBoundingSphereShape (object, options) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {CustomGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createTrimeshShape (geometry) {
@@ -290,13 +291,13 @@ function createTrimeshShape (geometry) {
  * Returns a single geometry for the given object. If the object is compound,
  * its geometries are automatically merged.
  * @param {THREE.Object3D} object
- * @return {THREE.Geometry}
+ * @return {CustomGeometry}
  */
 function getGeometry (object) {
   var matrix, mesh,
       meshes = getMeshes(object),
-      tmp = new THREE.Geometry(),
-      combined = new THREE.Geometry();
+      tmp = new CustomGeometry(),
+      combined = new CustomGeometry();
 
   if (meshes.length === 0) return null;
 
@@ -325,7 +326,7 @@ function getGeometry (object) {
     if (mesh.geometry.isBufferGeometry) {
       if (mesh.geometry.attributes.position
           && mesh.geometry.attributes.position.itemSize > 2) {
-        var tmpGeom = new THREE.Geometry();
+        var tmpGeom = new CustomGeometry();
         tmpGeom.fromBufferGeometry(mesh.geometry);
         combined.merge(tmpGeom, mesh.matrixWorld);
         tmpGeom.dispose();
@@ -342,7 +343,7 @@ function getGeometry (object) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {CustomGeometry} geometry
  * @return {Array<number>}
  */
 function getVertices (geometry) {

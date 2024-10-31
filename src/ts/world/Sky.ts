@@ -51,7 +51,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 		// Mesh
 		this.skyMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(1000, 24, 12),
+			new THREE.SphereGeometry(1000, 24, 12),
 			this.skyMaterial
 		);
 		this.attach(this.skyMesh);
@@ -88,8 +88,8 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		};
 
 		this.csm = new CSM({
-			fov: 80,
-			far: 250,	// maxFar
+			// fov: 80,
+			// far: 250,	// maxFar
 			lightIntensity: 2.5,
 			cascades: 3,
 			shadowMapSize: 2048,
@@ -111,7 +111,8 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		this.position.copy(this.world.camera.position);
 		this.refreshSunPosition();
 
-		this.csm.update(this.world.camera.matrix);
+		// this.csm.update(this.world.camera.matrix);
+		this.csm.update();
 		this.csm.lightDirection = new THREE.Vector3(-this.sunPosition.x, -this.sunPosition.y, -this.sunPosition.z).normalize();
 	}
 
