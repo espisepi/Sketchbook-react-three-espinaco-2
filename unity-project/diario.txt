@@ -1,0 +1,14 @@
+========= Proyecto Unity ===============
+
+neofps-rayfire-nwh-esmerald-ai
+
+1 - Integrar NeoFPS con Rayfire 
+-- Seguir instrucciones de https://github.com/YondernautsGames/NeoFPS_Rayfire
+--- solucionar error input al ejecutar escena de ejemplo en neofps (input-both-error.txt)
+
+2- Integrar NeoFPS-Rayfire con EsmeraldAI
+-- Seguir instrucciones de https://github.com/YondernautsGames/NeoFPS_EmeraldAI
+
+
+
+========================================

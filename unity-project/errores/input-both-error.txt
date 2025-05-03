@@ -1,0 +1,28 @@
+
+==================================================================================
+
+PREGUNTA:
+
+Tengo este error en unity al ejecutar la escena de ejemplo del asset neofps: InvalidOperationException: You are trying to read Input using the UnityEngine.Input class, but you have switched active Input handling to Input System package in Player Settings.
+UnityEngine.Internal.InputUnsafeUtility.GetButtonDown (System.String buttonName) (at <1bcf3db9368d4289aae60d04194b7157>:0)
+UnityEngine.Input.GetButtonDown (System.String buttonName) (at <1bcf3db9368d4289aae60d04194b7157>:0)
+UnityEngine.EventSystems.BaseInput.GetButtonDown (System.String buttonName) (at ./Library/PackageCache/com.unity.ugui@f3fac7af1578/Runtime/UGUI/EventSystem/InputModules/BaseInput.cs:134)
+UnityEngine.EventSystems.StandaloneInputModule.ShouldActivateModule () (at ./Library/PackageCache/com.unity.ugui@f3fac7af1578/Runtime/UGUI/EventSystem/InputModules/StandaloneInputModule.cs:229)
+UnityEngine.EventSystems.EventSystem.Update () (at ./Library/PackageCache/com.unity.ugui@f3fac7af1578/Runtime/UGUI/EventSystem/EventSystem.cs:503)
+
+RESPUESTA:
+
+Este error ocurre porque estás usando el nuevo sistema de Input de Unity (el Input System package) pero algún código (en este caso, de la escena o del asset NeoFPS) está intentando usar la API antigua (UnityEngine.Input), lo cual no está permitido si en los Player Settings has desactivado el soporte a esa API.
+
+Soluciones posibles:
+
+✅ Opción 1: Habilitar compatibilidad con ambos sistemas de Input (recomendado si usas assets antiguos)
+Ve a Edit > Project Settings > Player.
+
+En la sección Other Settings, busca Active Input Handling.
+
+Cámbialo de Input System Package (New) a Both.
+
+Esto permite usar tanto el sistema nuevo como el antiguo (UnityEngine.Input), y suele ser necesario con assets como NeoFPS que aún dependen del sistema viejo.
+
+===========================================================================

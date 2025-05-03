@@ -1,3 +1,8 @@
+Montar Sketchbook desdde cero en un nuevo proyecto
+añadir efectos de particulas con libro html5 most wanted
+
+=================================
+
 /*
  NOTA IMPORTANTE: A chuparla este proyecto porque da muchos problemas en su despliegue,
  Se utilizara como template First-Car-Shooter de sean bradley y de ahi añadire sketchbook.
