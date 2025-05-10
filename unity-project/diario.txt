@@ -1,14 +1,38 @@
+far cry 2 modding:
+https://docs.google.com/document/d/1ozhN9s_4puzSXVYs12ZAOayyL036hgQuFCVS_jSXbd0/edit?tab=t.0#heading=h.5yuedjwzmzz8
+
 ========= Proyecto Unity ===============
 
 neofps-rayfire-nwh-esmerald-ai
 
 1 - Integrar NeoFPS con Rayfire 
 -- Seguir instrucciones de https://github.com/YondernautsGames/NeoFPS_Rayfire
+-- importar neofps
 --- solucionar error input al ejecutar escena de ejemplo en neofps (input-both-error.txt)
+-- importar rayfire
+--- (NO LO HE HECHO, porque no encontraba el apartado de raycaster en la matriz de fisica de colisiones) corregir collider (duda-rayfire-collider.txt)
+-- Probar que funciona correctamente la escena de sample del proyecto github NeoFPS_Rayfire
 
-2- Integrar NeoFPS-Rayfire con EsmeraldAI
+2 - Integrar NeoFPS-Rayfire con EsmeraldAI
 -- Seguir instrucciones de https://github.com/YondernautsGames/NeoFPS_EmeraldAI
+-- Import the Emerald AI asset.
+-- Probar que funciona correctamente la escena de sample del proyecto github NeoFPS_EmeraldAI
+
+3 - Integrar NeoFPS-Rayfire-EsmeraldAI con NWH Vehicles (importar los 3 assets de nwh, car, aviones y barcos)
+-- Importar nwh vehicles 2 asset desde package manager
+-- Importar nwh aerodynamic asset desde package manager
+-- Importar Dynamic Water Physics 2 asset desde package manager
+
+4 - Importar el asset Endless - Infinite Terrain Generation desde package manager
+-- Se ve purple los objetos de la escena sample
+
+5 - Importar Living Particles asset desde package manager
+
+6 - Importar Ultimate VFX asset desde package manager
+
+5 - Importar amplify shader editor
+Amplify Shader Pack
 
 
-
+Forest Environment - Dynamic Nature
 ========================================

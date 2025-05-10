@@ -1,0 +1,58 @@
+
+================================================================
+
+PREGUNTA:
+
+dime como hacer este paso: Modify the physics collision matrix so that the rayfire layer does not collide with the following layers:
+
+EnvironmentDetail
+CharacterFirstPerson
+CharacterNonColliding
+
+RESPUESTA: 
+
+Claro. Para modificar la **collision matrix** (matriz de colisiones) en Unity y hacer que la capa `rayfire` **no colisione** con las capas `EnvironmentDetail`, `CharacterFirstPerson` y `CharacterNonColliding`, sigue estos pasos:
+
+---
+
+### ✅ PASOS:
+
+1. **Abre el Collision Matrix:**
+
+   * Ve a `Edit > Project Settings > Physics`.
+
+2. **Ubica la matriz de colisiones**:
+
+   * Dentro de la pestaña **Physics**, busca la sección llamada **Layer Collision Matrix**.
+
+3. **Busca la capa `rayfire`:**
+
+   * En la matriz, verás filas y columnas con los nombres de todas tus capas (layers).
+   * Localiza la **fila** (o columna) que corresponde a la capa `rayfire`.
+
+4. **Desactiva las casillas de colisión con las capas que indicaste:**
+
+   * Quita la marca de las siguientes casillas en la fila/columna de `rayfire`:
+
+     * `EnvironmentDetail`
+
+     * `CharacterFirstPerson`
+
+     * `CharacterNonColliding`
+
+   > Esto desactiva las colisiones entre `rayfire` y esas capas.
+
+5. **Listo**. Ahora los objetos en la capa `rayfire` no colisionarán con los objetos en esas otras capas.
+
+---
+
+### 📝 Consejo:
+
+Si no ves la capa `rayfire` o alguna de las otras, puede que aún no estén creadas. Para crear capas:
+
+* Ve a cualquier GameObject > en el Inspector > abre el desplegable de `Layer` > elige `Add Layer…` y añade las capas necesarias.
+
+¿Quieres que te dé un ejemplo en código para modificar la matriz desde script?
+
+
+================================================================
