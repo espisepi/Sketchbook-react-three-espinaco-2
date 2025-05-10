@@ -193,8 +193,8 @@ export class World {
       });
 
       // sepinaco: replace textures by videoclip
-      const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
-      this.registerUpdatable(replaceTextureVideoclip);
+      // const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
+      // this.registerUpdatable(replaceTextureVideoclip);
 
     } else {
       UIManager.setUserInterfaceVisible(true);
