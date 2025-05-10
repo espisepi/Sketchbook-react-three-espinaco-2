@@ -31,6 +31,7 @@ import { Vehicle } from "../vehicles/Vehicle";
 import { Scenario } from "./Scenario";
 import { Sky } from "./Sky";
 import { Ocean } from "./Ocean";
+import { ReplaceTextureVideoclip } from "./ReplaceTextureVideoclip";
 
 export class World {
   public renderer: THREE.WebGLRenderer;
@@ -190,6 +191,11 @@ export class World {
       loadingManager.loadGLTF(worldScenePath, (gltf) => {
         this.loadScene(loadingManager, gltf);
       });
+
+      // sepinaco: replace textures by videoclip
+      const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
+      this.registerUpdatable(replaceTextureVideoclip);
+
     } else {
       UIManager.setUserInterfaceVisible(true);
       UIManager.setLoadingScreenVisible(false);
@@ -229,7 +235,7 @@ export class World {
     // Step the physics world
     this.physicsWorld.step(this.physicsFrameTime, timeStep);
 
-    // sepinaco code commmented
+    // sepinaco: code commmented
     // this.characters.forEach((char) => {
     //   if (this.isOutOfBounds(char.characterCapsule.body.position)) {
     //     this.outOfBoundsRespawn(char.characterCapsule.body);
