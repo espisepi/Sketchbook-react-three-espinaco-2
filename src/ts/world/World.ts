@@ -66,6 +66,8 @@ export class World {
 
   private lastScenarioID: string;
 
+  public isVideoTextureReplacing: boolean = true;
+
   constructor(worldScenePath?: any) {
     const scope = this;
 
@@ -193,8 +195,10 @@ export class World {
       });
 
       // sepinaco: replace textures by videoclip
-      // const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
-      // this.registerUpdatable(replaceTextureVideoclip);
+      if(this.isVideoTextureReplacing) {
+        const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
+        this.registerUpdatable(replaceTextureVideoclip);
+      }
 
     } else {
       UIManager.setUserInterfaceVisible(true);

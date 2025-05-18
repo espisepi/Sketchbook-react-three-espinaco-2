@@ -81,7 +81,7 @@ export class ReplaceTextureVideoclip implements IUpdatable  {
 
 
 
-    private createVideoElement( src = "build/assets/music/lola-young-messy.mp4", showVideo = true ) : HTMLVideoElement {
+    private createVideoElement( src = "build/assets/music/Soto Asa y La Zowi - Smartphone   GALLERY SESSION.mp4", showVideo = true ) : HTMLVideoElement {
         const video : HTMLVideoElement = document.createElement('video');
         video.poster = 'https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217';
         video.autoplay = true;
