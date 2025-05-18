@@ -66,7 +66,7 @@ export class World {
 
   private lastScenarioID: string;
 
-  public isVideoTextureReplacing: boolean = true;
+  public isVideoTextureReplacing: boolean = false;
 
   constructor(worldScenePath?: any) {
     const scope = this;
