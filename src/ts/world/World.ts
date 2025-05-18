@@ -32,6 +32,7 @@ import { Scenario } from "./Scenario";
 import { Sky } from "./Sky";
 import { Ocean } from "./Ocean";
 import { ReplaceTextureVideoclip } from "./ReplaceTextureVideoclip";
+import { ProceduralTerrainWorld } from "./procedural-terrain/ProceduralTerrainWorld";
 
 export class World {
   public renderer: THREE.WebGLRenderer;
@@ -67,6 +68,7 @@ export class World {
   private lastScenarioID: string;
 
   public isVideoTextureReplacing: boolean = false;
+  public isProceduralTerrain: boolean = true;
 
   constructor(worldScenePath?: any) {
     const scope = this;
@@ -198,6 +200,11 @@ export class World {
       if(this.isVideoTextureReplacing) {
         const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
         this.registerUpdatable(replaceTextureVideoclip);
+      }
+
+      // sepinaco: init procedural terrain
+      if(this.isProceduralTerrain) {
+        const proceduralTerrainWorld = new ProceduralTerrainWorld(this);
       }
 
     } else {
