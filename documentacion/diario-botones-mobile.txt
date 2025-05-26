@@ -1,0 +1,15 @@
+
+
+
+26-05-25
+- Pedirle a chatgpt que me haga un joystick para mobile y desktop con accesibilidad
+y con todos los eventos asociados a metodos js cubriendo todos los eventos
+para que no de errores raro a la hora de jugar con el joystick
+- Pedirle a chatgpt lo mismo que lo anterior pero para botones.
+- Tener todos los botones y joystick mostrados en pantalla, uno al lado del otro, a modo de debug,
+y ver los valores al pulsarlos de cada boton y joystick imprimidos en pantalla.
+- Hacer el layout responsive yo con el css y mis fantasticas skills o pedirselo a chatgpt xD
+para poner los botones de manera bonita en mobile y desktop (boton para poder ocultarlos en mobile y desktop)
+- Asociar joystick y botones a controles de mando xbox (con api gamepad)
+(una vez hice eso para uno de los proyectos de sketchbook, buscarlo y replicarlo con clean code siguiendo una estructura,
+que este proyecto lo vamos a intentar mantener bonito, por la raza. )
