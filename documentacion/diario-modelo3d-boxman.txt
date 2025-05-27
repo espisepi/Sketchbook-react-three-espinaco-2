@@ -1,0 +1,216 @@
+
+
+- 26/05/25
+- incluir modelo 3d bully (canis canem edit) como player jugable
+(
+-- Descargar modelo 3d bully desde sketchfab.com
+-- Ponerle esquelo al modelo 3d bully desde la pagina web mixamo.com ( con la misma animacion que hay al importar boxman.glb en blender, que aparece con la animacion de conducir por defecto)
+) o
+(
+-- Descargar modelo 3d con esqueleto desde mixamo (elegir los modelos 3d que nos ofrece mixamo)
+)
+-- crear nuevo proyecto en blender
+-- importar boxman en blender
+-- importar bully (mixamo version descargada) en blender
+-- seguir los pasos de chatgpt:
+
+Perfecto, ya he analizado el modelo de **Jimmy Hopkins**. Contiene múltiples geometrías (como ropa o partes del cuerpo separadas), lo cual es típico en modelos extraídos de juegos.
+
+---
+
+## ✅ Siguiente paso: Reemplazar el modelo visual manteniendo la funcionalidad original
+
+### 🔁 Resumen del proceso en **Blender**:
+
+1. **Abre el archivo del personaje original (`boxman.glb`) en Blender.**
+
+2. **Importa el nuevo modelo `bully_ps2_-_jimmy_hopkins.glb`.**
+
+3. **Alinea el nuevo modelo con el esqueleto existente** (`Armature`):
+
+   * Ajusta posición, escala y rotación para que encaje sobre el esqueleto del `boxman`.
+
+4. **Une las partes del nuevo modelo (si lo deseas):**
+
+   * `Ctrl + J` para unir objetos seleccionados.
+
+5. **Asigna el Armature al nuevo modelo:**
+
+   * Selecciona el modelo.
+   * `Shift + clic` sobre el esqueleto (Armature).
+   * `Ctrl + P` > *With Automatic Weights*.
+
+6. **Comprueba que las animaciones funcionan:**
+
+   * Reproduce alguna animación del `boxman`.
+   * Verifica que el nuevo modelo se deforma correctamente.
+
+---
+
+## ⚠️ Consideraciones:
+
+* Si el nuevo modelo tiene **nombres de huesos distintos** y quieres conservar animaciones complejas, puede ser necesario hacer *retargeting manual* con herramientas como:
+
+  * [Auto-Rig Pro Retarget](https://blendermarket.com/products/auto-rig-pro)
+  * Herramientas nativas de Blender para **retargeting** con `Action Constraints` o `Copy Transforms`.
+
+* Si las proporciones del cuerpo son distintas, puede haber deformaciones no deseadas → necesitas ajustar pesos de pintura manualmente con `Weight Paint`.
+
+---
+
+## ¿Quieres que te genere un script o escena para ayudarte?
+
+Puedo darte un `.blend` de ejemplo o instrucciones paso a paso con capturas. Dime si vas a seguir en **Blender** o lo quieres usar en **Three.js**, **Unity** u otro entorno. ¿Qué prefieres?
+
+
+====================================================
+
+lo he probado pero no me hace la animacion, se queda con la pose t
+
+Gracias por probarlo. Si el modelo nuevo **se queda en T-pose** y **no se mueve con la animación del Armature original**, hay varias causas posibles. Vamos paso a paso para solucionarlo.
+
+---
+
+## 🧩 Posibles causas y soluciones
+
+### ✅ 1. **El modelo no está bien asociado al esqueleto (Armature)**
+
+Asegúrate de que hiciste esto **exactamente** en Blender:
+
+#### 🔗 Reasignación correcta:
+
+1. Selecciona **solo** el nuevo modelo (o todas sus partes).
+2. Luego `Shift + clic` sobre el `Armature`.
+3. Presiona `Ctrl + P` > `With Automatic Weights`.
+
+⚠️ Si usaste “With Empty Groups” o no hiciste esta asociación, **no se moverá**.
+
+---
+
+### ✅ 2. **El modelo sí está vinculado, pero no tiene pesos de pintura**
+
+Esto es común si el modelo original no tenía pesos o el esqueleto no lo entiende.
+
+#### ✅ SOLUCIÓN:
+
+1. Selecciona el nuevo modelo
+2. Modo `Weight Paint`
+3. Mueve los huesos en modo `Pose Mode` del Armature
+
+👉 Si no se colorea nada al seleccionar un hueso en Weight Paint, entonces **no hay pesos asignados**.
+
+#### 🔧 ARREGLAR:
+
+1. Selecciona el modelo
+2. `Ctrl + P` > `With Automatic Weights` de nuevo
+3. Si sigue sin funcionar, prueba con:
+
+   * `Ctrl + P` > `With Empty Groups`
+   * Luego en `Weight Paint`, asigna pesos manualmente
+
+---
+
+### ✅ 3. **El esqueleto tiene huesos diferentes o mal nombrados**
+
+Si el nuevo modelo tenía su propio esqueleto, **no son compatibles directamente**.
+
+#### SOLUCIÓN:
+
+**Reemplazar solo la malla, sin usar su esqueleto.**
+
+* Borra el Armature del modelo nuevo (si lo tiene)
+* Usa solo la malla y vincúlala al Armature original
+
+---
+
+## ✅ Comprobación final
+
+Haz esto en Blender:
+
+1. Abre el `boxman.glb`
+2. Importa el modelo de Jimmy
+3. Alinea la malla de Jimmy con el esqueleto del boxman
+4. `Ctrl + P` > `With Automatic Weights`
+5. Ve al `Dope Sheet` > `Action Editor`
+6. Reproduce la animación (si existe, aparecerá ahí como una `Action`)
+7. Modo Pose: mueve huesos manualmente y verifica que Jimmy responde
+
+---
+
+## ¿Te gustaría que te hiciera un video rápido o un archivo `.blend` de ejemplo?
+
+También puedo prepararte un `.blend` donde ya esté vinculado correctamente. Solo dime si estás usando Blender versión 3.x o anterior y te lo dejo listo para practicar.
+
+¿Quieres que lo prepare?
+
+====================================================
+
+si el nuevo modelo incorpora un armature porque lo he descargado desde mixamo, tengo que quitarselo antes?
+
+¡Buena pregunta! Sí, **si el modelo de Mixamo (como Jimmy Hopkins) trae su propio `Armature`**, lo ideal es **quitar ese `Armature` y usar el del personaje original (`boxman`)** para que las animaciones funcionen **sin retargeting complejo**.
+
+---
+
+## ✅ ¿Por qué quitar el `Armature` de Mixamo?
+
+Porque:
+
+* **El `Armature` de Mixamo no es compatible directamente** con las animaciones del `boxman`, ya que:
+
+  * Tiene **nombres de huesos diferentes**
+  * Tiene una **jerarquía distinta**
+  * Está pensado para usar **sus propias animaciones**
+* Si mantienes el esqueleto de Mixamo, **las animaciones del `boxman` no funcionarán** en él.
+
+---
+
+## 🧼 Cómo quitar el `Armature` del modelo de Mixamo en Blender
+
+### 🔧 PASOS:
+
+1. **Importa el modelo de Mixamo (`Jimmy`)**
+2. Selecciona solo el **Armature del modelo de Mixamo**
+
+   * Puedes hacerlo desde el **Outliner** (se llamará algo como `Armature` o similar)
+3. Pulsa `X` → *Delete*
+4. Te quedará solo la **malla** del modelo
+
+---
+
+## 🔗 Luego, asigna el esqueleto del `boxman`
+
+1. Alinea visualmente el nuevo modelo (Jimmy) con el Armature del `boxman`
+
+   * Usa `G`, `S`, `R` para mover, escalar y rotar
+   * Haz que su cuerpo encaje bien en la posición del esqueleto
+2. Selecciona la **malla del nuevo modelo**
+3. `Shift + clic` en el `Armature` del `boxman` (debe ser seleccionado el último)
+4. `Ctrl + P` → *With Automatic Weights*
+
+---
+
+## ✅ Resultado esperado
+
+Ahora el nuevo modelo:
+
+* Está vinculado al esqueleto del `boxman`
+* Responde a sus animaciones
+* No tiene conflictos de huesos
+
+---
+
+## ¿Quieres conservar el esqueleto de Mixamo?
+
+Solo en el caso de que **quieras usar las animaciones de Mixamo**, entonces sí deberías mantener su `Armature`, pero en ese caso:
+
+* Necesitarías **retargeting manual o con Add-ons** (más avanzado)
+* Las animaciones del `boxman` ya no servirán directamente
+
+---
+
+¿Te gustaría que prepare un `.blend` con el modelo ya vinculado correctamente al esqueleto del boxman? Solo dime si estás usando Blender 3.x o qué versión tienes.
+
+
+====================================================
+-- (old) Abrir boxman.glb en blender (o abrir el archivo original del modelo 3d en blender)
+y reemplazar el boxman por el modelo bully con todas sus configuraciones tal y como las tiene boxman
