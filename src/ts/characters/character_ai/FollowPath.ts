@@ -7,29 +7,26 @@ import { ICharacterAI } from '../../interfaces/ICharacterAI';
 import { PathNode } from '../../world/PathNode';
 import { Vehicle } from '../../vehicles/Vehicle';
 
-export class FollowPath extends FollowTarget implements ICharacterAI
-{
+export class FollowPath extends FollowTarget implements ICharacterAI {
 	public nodeRadius: number;
 	public reverse: boolean = false;
 
 	private staleTimer: number = 0;
 	private targetNode: PathNode;
 
-	constructor(firstNode: PathNode, nodeRadius: number)
-	{
+	constructor(firstNode: PathNode, nodeRadius: number) {
 		super(firstNode.object, 0);
 		this.nodeRadius = nodeRadius;
 		this.targetNode = firstNode;
 	}
 
-	public update(timeStep: number): void
-	{
+	public update(timeStep: number): void {
 		super.update(timeStep);
 
 		// Todo only compute once in followTarget
 		let source = new THREE.Vector3();
 		let target = new THREE.Vector3();
-		this.character.getWorldPosition(source);
+		(this.character as any).getWorldPosition(source);
 		this.target.getWorldPosition(target);
 		let viewVector = new THREE.Vector3().subVectors(target, source);
 		viewVector.y = 0;
@@ -41,16 +38,14 @@ export class FollowPath extends FollowTarget implements ICharacterAI
 		let speed = (this.character.controlledObject as unknown as Vehicle).collision.velocity.length();
 
 		// console.log(slowDownAngle, viewVector.length(), speed);
-		if ((slowDownAngle < 0.7 && viewVector.length() < 50 && speed > 10))
-		{
+		if ((slowDownAngle < 0.7 && viewVector.length() < 50 && speed > 10)) {
 			this.character.controlledObject.triggerAction('reverse', true);
 			this.character.controlledObject.triggerAction('throttle', false);
 		}
 
 		if (speed < 1 || (this.character.controlledObject as unknown as Vehicle).rayCastVehicle.numWheelsOnGround === 0) this.staleTimer += timeStep;
 		else this.staleTimer = 0;
-		if (this.staleTimer > 5)
-		{
+		if (this.staleTimer > 5) {
 			let worldPos = new THREE.Vector3();
 			this.targetNode.object.getWorldPosition(worldPos);
 			worldPos.y += 3;
@@ -61,15 +56,12 @@ export class FollowPath extends FollowTarget implements ICharacterAI
 			this.staleTimer = 0;
 		}
 
-		if (viewVector.length() < this.nodeRadius) 
-		{
-			if (this.reverse)
-			{
+		if (viewVector.length() < this.nodeRadius) {
+			if (this.reverse) {
 				super.setTarget(this.targetNode.previousNode.object);
 				this.targetNode = this.targetNode.previousNode;
 			}
-			else
-			{
+			else {
 				super.setTarget(this.targetNode.nextNode.object);
 				this.targetNode = this.targetNode.nextNode;
 			}

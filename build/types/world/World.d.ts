@@ -44,6 +44,8 @@ export declare class World {
     scenarioGUIFolder: any;
     updatables: IUpdatable[];
     private lastScenarioID;
+    isVideoTextureReplacing: boolean;
+    isProceduralTerrain: boolean;
     constructor(worldScenePath?: any);
     update(timeStep: number, unscaledTimeStep: number): void;
     updatePhysics(timeStep: number): void;

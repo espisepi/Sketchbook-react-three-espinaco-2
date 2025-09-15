@@ -130,13 +130,15 @@ CannonDebugRenderer.prototype = {
             break;
 
         case CANNON.Shape.types.CONVEXPOLYHEDRON:
-            // Create mesh
-            var geo = new THREE.Geometry();
+            // Create mesh using BufferGeometry
+            var geo = new THREE.BufferGeometry();
+            var vertices = [];
+            var indices = [];
 
             // Add vertices
             for (var i = 0; i < shape.vertices.length; i++) {
                 var v = shape.vertices[i];
-                geo.vertices.push(new THREE.Vector3(v.x, v.y, v.z));
+                vertices.push(v.x, v.y, v.z);
             }
 
             for(var i=0; i < shape.faces.length; i++){
@@ -147,39 +149,46 @@ CannonDebugRenderer.prototype = {
                 for (var j = 1; j < face.length - 1; j++) {
                     var b = face[j];
                     var c = face[j + 1];
-                    geo.faces.push(new THREE.Face3(a, b, c));
+                    indices.push(a, b, c);
                 }
             }
-            geo.computeBoundingSphere();
-            geo.computeFaceNormals();
+
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geo.setIndex(indices);
+            geo.computeVertexNormals();
 
             mesh = new THREE.Mesh(geo, cyan);
             shape.geometryId = geo.id;
             break;
 
         case CANNON.Shape.types.TRIMESH:
-            var geometry = new THREE.Geometry();
+            var geometry = new THREE.BufferGeometry();
+            var vertices = [];
+            var indices = [];
             var v0 = this.tmpVec0;
             var v1 = this.tmpVec1;
             var v2 = this.tmpVec2;
             for (var i = 0; i < shape.indices.length / 3; i++) {
                 shape.getTriangleVertices(i, v0, v1, v2);
-                geometry.vertices.push(
-                    new THREE.Vector3(v0.x, v0.y, v0.z),
-                    new THREE.Vector3(v1.x, v1.y, v1.z),
-                    new THREE.Vector3(v2.x, v2.y, v2.z)
+                vertices.push(
+                    v0.x, v0.y, v0.z,
+                    v1.x, v1.y, v1.z,
+                    v2.x, v2.y, v2.z
                 );
-                var j = geometry.vertices.length - 3;
-                geometry.faces.push(new THREE.Face3(j, j+1, j+2));
+                var j = vertices.length / 3 - 3;
+                indices.push(j, j+1, j+2);
             }
-            geometry.computeBoundingSphere();
-            geometry.computeFaceNormals();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
             mesh = new THREE.Mesh(geometry, purple);
             shape.geometryId = geometry.id;
             break;
 
         case CANNON.Shape.types.HEIGHTFIELD:
-            var geometry = new THREE.Geometry();
+            var geometry = new THREE.BufferGeometry();
+            var vertices = [];
+            var indices = [];
 
             var v0 = this.tmpVec0;
             var v1 = this.tmpVec1;
@@ -194,18 +203,19 @@ CannonDebugRenderer.prototype = {
                         v0.vadd(shape.pillarOffset, v0);
                         v1.vadd(shape.pillarOffset, v1);
                         v2.vadd(shape.pillarOffset, v2);
-                        geometry.vertices.push(
-                            new THREE.Vector3(v0.x, v0.y, v0.z),
-                            new THREE.Vector3(v1.x, v1.y, v1.z),
-                            new THREE.Vector3(v2.x, v2.y, v2.z)
+                        vertices.push(
+                            v0.x, v0.y, v0.z,
+                            v1.x, v1.y, v1.z,
+                            v2.x, v2.y, v2.z
                         );
-                        var i = geometry.vertices.length - 3;
-                        geometry.faces.push(new THREE.Face3(i, i+1, i+2));
+                        var i = vertices.length / 3 - 3;
+                        indices.push(i, i+1, i+2);
                     }
                 }
             }
-            geometry.computeBoundingSphere();
-            geometry.computeFaceNormals();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
             mesh = new THREE.Mesh(geometry, purple);
             shape.geometryId = geometry.id;
             break;

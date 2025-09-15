@@ -13,11 +13,10 @@ import { SwitchingSeats } from '../characters/character_states/vehicles/Switchin
 import { EntityType } from '../enums/EntityType';
 import { IWorldEntity } from '../interfaces/IWorldEntity';
 
-export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
-{
+export abstract class Vehicle extends THREE.Object3D implements IWorldEntity {
 	public updateOrder: number = 2;
 	public abstract entityType: EntityType;
-	
+
 	public controllingCharacter: Character;
 	public actions: { [action: string]: KeyBinding; } = {};
 	public rayCastVehicle: CANNON.RaycastVehicle;
@@ -32,15 +31,18 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 	public spawnPoint: THREE.Object3D;
 	private modelContainer: THREE.Group;
 
+	// Explicitly declare inherited properties for TypeScript
+	public position: THREE.Vector3;
+	public quaternion: THREE.Quaternion;
+
 	private firstPerson: boolean = false;
 
-	constructor(gltf: any, handlingSetup?: any)
-	{
+	constructor(gltf: any, handlingSetup?: any) {
 		super();
 
 		if (handlingSetup === undefined) handlingSetup = {};
 		handlingSetup.chassisConnectionPointLocal = new CANNON.Vec3(),
-		handlingSetup.axleLocal = new CANNON.Vec3(-1, 0, 0);
+			handlingSetup.axleLocal = new CANNON.Vec3(-1, 0, 0);
 		handlingSetup.directionLocal = new CANNON.Vec3(0, -1, 0);
 
 		// Physics mat
@@ -55,7 +57,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		this.readVehicleData(gltf);
 
 		this.modelContainer = new THREE.Group();
-		this.add(this.modelContainer);
+		(this as any).add(this.modelContainer);
 		this.modelContainer.add(gltf.scene);
 		// this.setModel(gltf.scene);
 
@@ -67,8 +69,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			indexForwardAxis: 2
 		});
 
-		this.wheels.forEach((wheel) =>
-		{
+		this.wheels.forEach((wheel) => {
 			handlingSetup.chassisConnectionPointLocal.set(wheel.position.x, wheel.position.y + 0.2, wheel.position.z);
 			const index = this.rayCastVehicle.addWheel(handlingSetup);
 			wheel.rayCastWheelInfoIndex = index;
@@ -77,13 +78,11 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		this.help = new THREE.AxesHelper(2);
 	}
 
-	public noDirectionPressed(): boolean
-	{
+	public noDirectionPressed(): boolean {
 		return true;
 	}
 
-	public update(timeStep: number): void
-	{
+	public update(timeStep: number): void {
 		this.position.set(
 			this.collision.interpolatedPosition.x,
 			this.collision.interpolatedPosition.y,
@@ -101,8 +100,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			seat.update(timeStep);
 		});
 
-		for (let i = 0; i < this.rayCastVehicle.wheelInfos.length; i++)
-		{
+		for (let i = 0; i < this.rayCastVehicle.wheelInfos.length; i++) {
 			this.rayCastVehicle.updateWheelTransform(i);
 			let transform = this.rayCastVehicle.wheelInfos[i].worldTransform;
 
@@ -114,19 +112,16 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			this.rayCastVehicle.getVehicleAxisWorld(this.rayCastVehicle.indexUpAxis, upAxisWorld);
 		}
 
-		this.updateMatrixWorld();
+		(this as any).updateMatrixWorld();
 	}
 
-	public forceCharacterOut(): void
-	{
+	public forceCharacterOut(): void {
 		this.controllingCharacter.modelContainer.visible = true;
 		this.controllingCharacter.exitVehicle();
 	}
 
-	public onInputChange(): void
-	{
-		if (this.actions.seat_switch.justPressed && this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0)
-		{
+	public onInputChange(): void {
+		if (this.actions.seat_switch.justPressed && this.controllingCharacter?.occupyingSeat?.connectedSeats.length > 0) {
 			this.controllingCharacter.modelContainer.visible = true;
 			this.controllingCharacter.setState(
 				new SwitchingSeats(
@@ -139,8 +134,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public resetControls(): void
-	{
+	public resetControls(): void {
 		for (const action in this.actions) {
 			if (this.actions.hasOwnProperty(action)) {
 				this.triggerAction(action, false);
@@ -148,37 +142,30 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public allowSleep(value: boolean): void
-	{
+	public allowSleep(value: boolean): void {
 		this.collision.allowSleep = value;
 
-		if (value === false)
-		{
+		if (value === false) {
 			this.collision.wakeUp();
 		}
 	}
 
-	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
-	{
+	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void {
 		// Free camera
-		if (code === 'KeyC' && pressed === true && event.shiftKey === true)
-		{
+		if (code === 'KeyC' && pressed === true && event.shiftKey === true) {
 			this.resetControls();
 			this.world.cameraOperator.characterCaller = this.controllingCharacter;
 			this.world.inputManager.setInputReceiver(this.world.cameraOperator);
 		}
-		else if (code === 'KeyR' && pressed === true && event.shiftKey === true)
-		{
+		else if (code === 'KeyR' && pressed === true && event.shiftKey === true) {
 			this.world.restartScenario();
 		}
-		else
-		{
+		else {
 			for (const action in this.actions) {
 				if (this.actions.hasOwnProperty(action)) {
 					const binding = this.actions[action];
 
-					if (_.includes(binding.eventCodes, code))
-					{
+					if (_.includes(binding.eventCodes, code)) {
 						this.triggerAction(action, pressed);
 					}
 				}
@@ -186,33 +173,27 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public setFirstPersonView(value: boolean): void
-	{
+	public setFirstPersonView(value: boolean): void {
 		this.firstPerson = value;
 		if (this.controllingCharacter !== undefined) this.controllingCharacter.modelContainer.visible = !value;
 
-		if (value)
-		{
+		if (value) {
 			this.world.cameraOperator.setRadius(0, true);
 		}
-		else
-		{
+		else {
 			this.world.cameraOperator.setRadius(3, true);
 		}
 	}
 
-	public toggleFirstPersonView(): void
-	{
+	public toggleFirstPersonView(): void {
 		this.setFirstPersonView(!this.firstPerson);
 	}
-	
-	public triggerAction(actionName: string, value: boolean): void
-	{
+
+	public triggerAction(actionName: string, value: boolean): void {
 		// Get action and set it's parameters
 		let action = this.actions[actionName];
 
-		if (action.isPressed !== value)
-		{
+		if (action.isPressed !== value) {
 			// Set value
 			action.isPressed = value;
 
@@ -232,31 +213,25 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void
-	{
+	public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void {
 		return;
 	}
 
-	public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
-	{
+	public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void {
 		this.world.cameraOperator.move(deltaX, deltaY);
 	}
 
-	public handleMouseWheel(event: WheelEvent, value: number): void
-	{
+	public handleMouseWheel(event: WheelEvent, value: number): void {
 		this.world.scrollTheTimeScale(value);
 	}
 
-	public inputReceiverInit(): void
-	{
+	public inputReceiverInit(): void {
 		this.collision.allowSleep = false;
 		this.setFirstPersonView(false);
 	}
 
-	public inputReceiverUpdate(timeStep: number): void
-	{
-		if (this.firstPerson)
-		{
+	public inputReceiverUpdate(timeStep: number): void {
+		if (this.firstPerson) {
 			// this.world.cameraOperator.target.set(
 			//     this.position.x + this.camera.position.x,
 			//     this.position.y + this.camera.position.y,
@@ -267,8 +242,7 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 			temp.applyQuaternion(this.quaternion);
 			this.world.cameraOperator.target.copy(temp.add(this.position));
 		}
-		else
-		{
+		else {
 			// Position camera
 			this.world.cameraOperator.target.set(
 				this.position.x,
@@ -278,136 +252,106 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public setPosition(x: number, y: number, z: number): void
-	{
+	public setPosition(x: number, y: number, z: number): void {
 		this.collision.position.x = x;
 		this.collision.position.y = y;
 		this.collision.position.z = z;
 	}
 
-	public setSteeringValue(val: number): void
-	{
-		this.wheels.forEach((wheel) =>
-		{
+	public setSteeringValue(val: number): void {
+		this.wheels.forEach((wheel) => {
 			if (wheel.steering) this.rayCastVehicle.setSteeringValue(val, wheel.rayCastWheelInfoIndex);
 		});
 	}
 
-	public applyEngineForce(force: number): void
-	{
-		this.wheels.forEach((wheel) =>
-		{
-			if (this.drive === wheel.drive || this.drive === 'awd')
-			{
+	public applyEngineForce(force: number): void {
+		this.wheels.forEach((wheel) => {
+			if (this.drive === wheel.drive || this.drive === 'awd') {
 				this.rayCastVehicle.applyEngineForce(force, wheel.rayCastWheelInfoIndex);
 			}
 		});
 	}
 
-	public setBrake(brakeForce: number, driveFilter?: string): void
-	{
-		this.wheels.forEach((wheel) =>
-		{
-			if (driveFilter === undefined || driveFilter === wheel.drive)
-			{
+	public setBrake(brakeForce: number, driveFilter?: string): void {
+		this.wheels.forEach((wheel) => {
+			if (driveFilter === undefined || driveFilter === wheel.drive) {
 				this.rayCastVehicle.setBrake(brakeForce, wheel.rayCastWheelInfoIndex);
 			}
 		});
 	}
 
-	public addToWorld(world: World): void
-	{
-		if (_.includes(world.vehicles, this))
-		{
+	public addToWorld(world: World): void {
+		if (_.includes(world.vehicles, this)) {
 			console.warn('Adding character to a world in which it already exists.');
 		}
-		else if (this.rayCastVehicle === undefined)
-		{
+		else if (this.rayCastVehicle === undefined) {
 			console.error('Trying to create vehicle without raycastVehicleComponent');
 		}
-		else
-		{
+		else {
 			this.world = world;
 			world.vehicles.push(this);
 			world.graphicsWorld.add(this);
 			// world.physicsWorld.addBody(this.collision);
 			this.rayCastVehicle.addToWorld(world.physicsWorld);
 
-			this.wheels.forEach((wheel) =>
-			{
+			this.wheels.forEach((wheel) => {
 				world.graphicsWorld.attach(wheel.wheelObject);
 			});
 
-			this.materials.forEach((mat) =>
-			{
+			this.materials.forEach((mat) => {
 				world.sky.csm.setupMaterial(mat);
 			});
 		}
 	}
 
-	public removeFromWorld(world: World): void
-	{
-		if (!_.includes(world.vehicles, this))
-		{
+	public removeFromWorld(world: World): void {
+		if (!_.includes(world.vehicles, this)) {
 			console.warn('Removing character from a world in which it isn\'t present.');
 		}
-		else
-		{
+		else {
 			this.world = undefined;
 			_.pull(world.vehicles, this);
 			world.graphicsWorld.remove(this);
 			// world.physicsWorld.remove(this.collision);
 			this.rayCastVehicle.removeFromWorld(world.physicsWorld);
 
-			this.wheels.forEach((wheel) =>
-			{
+			this.wheels.forEach((wheel) => {
 				world.graphicsWorld.remove(wheel.wheelObject);
 			});
 		}
 	}
 
-	public readVehicleData(gltf: any): void
-	{
+	public readVehicleData(gltf: any): void {
 		gltf.scene.traverse((child) => {
 
-			if (child.isMesh)
-			{
+			if (child.isMesh) {
 				Utils.setupMeshProperties(child);
 
-				if (child.material !== undefined)
-				{
+				if (child.material !== undefined) {
 					this.materials.push(child.material);
 				}
 			}
 
-			if (child.hasOwnProperty('userData'))
-			{
-				if (child.userData.hasOwnProperty('data'))
-				{
-					if (child.userData.data === 'seat')
-					{
+			if (child.hasOwnProperty('userData')) {
+				if (child.userData.hasOwnProperty('data')) {
+					if (child.userData.data === 'seat') {
 						this.seats.push(new VehicleSeat(this, child, gltf));
 					}
-					if (child.userData.data === 'camera')
-					{
+					if (child.userData.data === 'camera') {
 						this.camera = child;
 					}
-					if (child.userData.data === 'wheel')
-					{
+					if (child.userData.data === 'wheel') {
 						this.wheels.push(new Wheel(child));
 					}
-					if (child.userData.data === 'collision')
-					{
-						if (child.userData.shape === 'box')
-						{
+					if (child.userData.data === 'collision') {
+						if (child.userData.shape === 'box') {
 							child.visible = false;
 
 							let phys = new CANNON.Box(new CANNON.Vec3(child.scale.x, child.scale.y, child.scale.z));
 							phys.collisionFilterMask = ~CollisionGroups.TrimeshColliders;
 							this.collision.addShape(phys, new CANNON.Vec3(child.position.x, child.position.y, child.position.z));
 						}
-						else if (child.userData.shape === 'sphere')
-						{
+						else if (child.userData.shape === 'sphere') {
 							child.visible = false;
 
 							let phys = new CANNON.Sphere(child.scale.x);
@@ -415,47 +359,36 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 							this.collision.addShape(phys, new CANNON.Vec3(child.position.x, child.position.y, child.position.z));
 						}
 					}
-					if (child.userData.data === 'navmesh')
-					{
+					if (child.userData.data === 'navmesh') {
 						child.visible = false;
 					}
 				}
 			}
 		});
 
-		if (this.collision.shapes.length === 0)
-		{
-			console.warn('Vehicle ' + typeof(this) + ' has no collision data.');
+		if (this.collision.shapes.length === 0) {
+			console.warn('Vehicle ' + typeof (this) + ' has no collision data.');
 		}
-		if (this.seats.length === 0)
-		{
-			console.warn('Vehicle ' + typeof(this) + ' has no seats.');
+		if (this.seats.length === 0) {
+			console.warn('Vehicle ' + typeof (this) + ' has no seats.');
 		}
-		else
-		{
+		else {
 			this.connectSeats();
 		}
 	}
 
-	private connectSeats(): void
-	{
-		for (const firstSeat of this.seats)
-		{
-			if (firstSeat.connectedSeatsString !== undefined)
-			{
+	private connectSeats(): void {
+		for (const firstSeat of this.seats) {
+			if (firstSeat.connectedSeatsString !== undefined) {
 				// Get list of connected seat names
 				let conn_seat_names = firstSeat.connectedSeatsString.split(';');
-				for (const conn_seat_name of conn_seat_names)
-				{
+				for (const conn_seat_name of conn_seat_names) {
 					// If name not empty
-					if (conn_seat_name.length > 0)
-					{
+					if (conn_seat_name.length > 0) {
 						// Run through seat list and connect seats to this seat,
 						// based on this seat's connected seats list
-						for (const secondSeat of this.seats)
-						{
-							if (secondSeat.seatPointObject.name === conn_seat_name) 
-							{
+						for (const secondSeat of this.seats) {
+							if (secondSeat.seatPointObject.name === conn_seat_name) {
 								firstSeat.connectedSeats.push(secondSeat);
 							}
 						}

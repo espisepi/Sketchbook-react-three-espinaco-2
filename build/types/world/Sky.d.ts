@@ -4,6 +4,7 @@ import { IUpdatable } from '../interfaces/IUpdatable';
 import { default as CSM } from 'three-csm';
 export declare class Sky extends THREE.Object3D implements IUpdatable {
     updateOrder: number;
+    position: THREE.Vector3;
     sunPosition: THREE.Vector3;
     csm: CSM;
     set theta(value: number);

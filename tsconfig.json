@@ -4,13 +4,20 @@
     ],
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es5",
+        "target": "es2017",
         "moduleResolution": "node",
         "declaration": true,
         "declarationDir": "build/types",
         "baseUrl": ".",
+        "strict": false,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
         "paths": {
-            "cannon" : ["src/lib/cannon/cannon"]
+            "cannon": [
+                "src/lib/cannon/cannon"
+            ]
         }
     }
 }

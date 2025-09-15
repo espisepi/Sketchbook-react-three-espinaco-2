@@ -7,11 +7,9 @@ import { Falling } from '../Falling';
 import { ExitingStateBase } from './ExitingStateBase';
 import { Vehicle } from '../../../vehicles/Vehicle';
 
-export class ExitingAirplane extends ExitingStateBase
-{
+export class ExitingAirplane extends ExitingStateBase {
 
-	constructor(character: Character, seat: VehicleSeat)
-	{
+	constructor(character: Character, seat: VehicleSeat) {
 		super(character, seat);
 
 		this.endPosition.copy(this.startPosition);
@@ -26,18 +24,15 @@ export class ExitingAirplane extends ExitingStateBase
 		this.playAnimation('jump_idle', 0.1);
 	}
 
-	public update(timeStep: number): void
-	{
+	public update(timeStep: number): void {
 		super.update(timeStep);
 
-		if (this.animationEnded(timeStep))
-		{
+		if (this.animationEnded(timeStep)) {
 			this.detachCharacterFromVehicle();
 			this.character.setState(new Falling(this.character));
 			this.character.leaveSeat();
 		}
-		else
-		{
+		else {
 			let beginningCutoff = 0.3;
 			let factor = THREE.MathUtils.clamp(((this.timer / this.animationLength) - beginningCutoff) * (1 / (1 - beginningCutoff)), 0, 1);
 			let smoothFactor = Utils.easeOutQuad(factor);
@@ -46,7 +41,7 @@ export class ExitingAirplane extends ExitingStateBase
 
 			// Rotation
 			this.updateEndRotation();
-			THREE.Quaternion.slerp(this.startRotation, this.endRotation, this.character.quaternion, smoothFactor);
+			this.character.quaternion.slerpQuaternions(this.startRotation, this.endRotation, smoothFactor);
 		}
 	}
 }

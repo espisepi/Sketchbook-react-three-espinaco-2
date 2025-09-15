@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import Swal from "sweetalert2";
-import * as $ from "jquery";
+import $ from "jquery";
 
 import { CameraOperator } from "../core/CameraOperator";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
@@ -186,10 +186,9 @@ export class World {
           footer:
             '<a href="https://github.com/swift502/Sketchbook" target="_blank">GitHub page</a><a href="https://discord.gg/fGuEqCe" target="_blank">Discord server</a>',
           confirmButtonText: "Okay",
-          buttonsStyling: false,
-          onClose: () => {
-            UIManager.setUserInterfaceVisible(true);
-          },
+          buttonsStyling: false
+        }).then(() => {
+          UIManager.setUserInterfaceVisible(true);
         });
       };
       loadingManager.loadGLTF(worldScenePath, (gltf) => {
@@ -197,13 +196,13 @@ export class World {
       });
 
       // sepinaco: replace textures by videoclip
-      if(this.isVideoTextureReplacing) {
+      if (this.isVideoTextureReplacing) {
         const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
         this.registerUpdatable(replaceTextureVideoclip);
       }
 
       // sepinaco: init procedural terrain
-      if(this.isProceduralTerrain) {
+      if (this.isProceduralTerrain) {
         const proceduralTerrainWorld = new ProceduralTerrainWorld(this);
       }
 

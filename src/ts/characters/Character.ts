@@ -28,10 +28,13 @@ import { ClosestObjectFinder } from '../core/ClosestObjectFinder';
 import { Object3D } from 'three';
 import { EntityType } from '../enums/EntityType';
 
-export class Character extends THREE.Object3D implements IWorldEntity
-{
+export class Character extends THREE.Object3D implements IWorldEntity {
 	public updateOrder: number = 1;
 	public entityType: EntityType = EntityType.Character;
+
+	// Explicitly declare inherited properties for TypeScript
+	public position: THREE.Vector3;
+	public quaternion: THREE.Quaternion;
 
 	public height: number = 0;
 	public tiltContainer: THREE.Group;
@@ -60,7 +63,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public viewVector: THREE.Vector3;
 	public actions: { [action: string]: KeyBinding };
 	public characterCapsule: CapsuleCollider;
-	
+
 	// Ray casting
 	public rayResult: CANNON.RaycastResult = new CANNON.RaycastResult();
 	public rayHasHit: boolean = false;
@@ -70,20 +73,19 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public initJumpSpeed: number = -1;
 	public groundImpactData: GroundImpactData = new GroundImpactData();
 	public raycastBox: THREE.Mesh;
-	
+
 	public world: World;
 	public charState: ICharacterState;
 	public behaviour: ICharacterAI;
-	
+
 	// Vehicles
 	public controlledObject: IControllable;
 	public occupyingSeat: VehicleSeat = null;
 	public vehicleEntryInstance: VehicleEntryInstance = null;
-	
+
 	private physicsEnabled: boolean = true;
 
-	constructor(gltf: any)
-	{
+	constructor(gltf: any) {
 		super();
 
 		this.readCharacterData(gltf);
@@ -91,7 +93,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 		// The visuals group is centered for easy character tilting
 		this.tiltContainer = new THREE.Group();
-		this.add(this.tiltContainer);
+		(this as any).add(this.tiltContainer);
 
 		// Model container is used to reliably ground the character, as animation can alter the position of the model itself
 		this.modelContainer = new THREE.Group();
@@ -162,18 +164,15 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.setState(new Idle(this));
 	}
 
-	public setAnimations(animations: []): void
-	{
+	public setAnimations(animations: []): void {
 		this.animations = animations;
 	}
 
-	public setArcadeVelocityInfluence(x: number, y: number = x, z: number = x): void
-	{
+	public setArcadeVelocityInfluence(x: number, y: number = x, z: number = x): void {
 		this.arcadeVelocityInfluence.set(x, y, z);
 	}
 
-	public setViewVector(vector: THREE.Vector3): void
-	{
+	public setViewVector(vector: THREE.Vector3): void {
 		this.viewVector.copy(vector).normalize();
 	}
 
@@ -181,30 +180,25 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	 * Set state to the player. Pass state class (function) name.
 	 * @param {function} State 
 	 */
-	public setState(state: ICharacterState): void
-	{
+	public setState(state: ICharacterState): void {
 		this.charState = state;
 		this.charState.onInputChange();
 	}
 
-	public setPosition(x: number, y: number, z: number): void
-	{
-		if (this.physicsEnabled)
-		{
+	public setPosition(x: number, y: number, z: number): void {
+		if (this.physicsEnabled) {
 			this.characterCapsule.body.previousPosition = new CANNON.Vec3(x, y, z);
 			this.characterCapsule.body.position = new CANNON.Vec3(x, y, z);
 			this.characterCapsule.body.interpolatedPosition = new CANNON.Vec3(x, y, z);
 		}
-		else
-		{
+		else {
 			this.position.x = x;
 			this.position.y = y;
 			this.position.z = z;
 		}
 	}
 
-	public resetVelocity(): void
-	{
+	public resetVelocity(): void {
 		this.velocity.x = 0;
 		this.velocity.y = 0;
 		this.velocity.z = 0;
@@ -216,32 +210,27 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.velocitySimulator.init();
 	}
 
-	public setArcadeVelocityTarget(velZ: number, velX: number = 0, velY: number = 0): void
-	{
+	public setArcadeVelocityTarget(velZ: number, velX: number = 0, velY: number = 0): void {
 		this.velocityTarget.z = velZ;
 		this.velocityTarget.x = velX;
 		this.velocityTarget.y = velY;
 	}
 
-	public setOrientation(vector: THREE.Vector3, instantly: boolean = false): void
-	{
+	public setOrientation(vector: THREE.Vector3, instantly: boolean = false): void {
 		let lookVector = new THREE.Vector3().copy(vector).setY(0).normalize();
 		this.orientationTarget.copy(lookVector);
-		
-		if (instantly)
-		{
+
+		if (instantly) {
 			this.orientation.copy(lookVector);
 		}
 	}
 
-	public resetOrientation(): void
-	{
+	public resetOrientation(): void {
 		const forward = Utils.getForward(this);
 		this.setOrientation(forward, true);
 	}
 
-	public setBehaviour(behaviour: ICharacterAI): void
-	{
+	public setBehaviour(behaviour: ICharacterAI): void {
 		behaviour.character = this;
 		this.behaviour = behaviour;
 	}
@@ -249,59 +238,47 @@ export class Character extends THREE.Object3D implements IWorldEntity
 	public setPhysicsEnabled(value: boolean): void {
 		this.physicsEnabled = value;
 
-		if (value === true)
-		{
+		if (value === true) {
 			this.world.physicsWorld.addBody(this.characterCapsule.body);
 		}
-		else
-		{
+		else {
 			this.world.physicsWorld.remove(this.characterCapsule.body);
 		}
 	}
 
-	public readCharacterData(gltf: any): void
-	{
+	public readCharacterData(gltf: any): void {
 		gltf.scene.traverse((child) => {
 
-			if (child.isMesh)
-			{
+			if (child.isMesh) {
 				Utils.setupMeshProperties(child);
 
-				if (child.material !== undefined)
-				{
+				if (child.material !== undefined) {
 					this.materials.push(child.material);
 				}
 			}
 		});
 	}
 
-	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void
-	{
-		if (this.controlledObject !== undefined)
-		{
+	public handleKeyboardEvent(event: KeyboardEvent, code: string, pressed: boolean): void {
+		if (this.controlledObject !== undefined) {
 			this.controlledObject.handleKeyboardEvent(event, code, pressed);
 		}
-		else
-		{
+		else {
 			// Free camera
-			if (code === 'KeyC' && pressed === true && event.shiftKey === true)
-			{
+			if (code === 'KeyC' && pressed === true && event.shiftKey === true) {
 				this.resetControls();
 				this.world.cameraOperator.characterCaller = this;
 				this.world.inputManager.setInputReceiver(this.world.cameraOperator);
 			}
-			else if (code === 'KeyR' && pressed === true && event.shiftKey === true)
-			{
+			else if (code === 'KeyR' && pressed === true && event.shiftKey === true) {
 				this.world.restartScenario();
 			}
-			else
-			{
+			else {
 				for (const action in this.actions) {
 					if (this.actions.hasOwnProperty(action)) {
 						const binding = this.actions[action];
-	
-						if (_.includes(binding.eventCodes, code))
-						{
+
+						if (_.includes(binding.eventCodes, code)) {
 							this.triggerAction(action, pressed);
 						}
 					}
@@ -310,20 +287,16 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void
-	{
-		if (this.controlledObject !== undefined)
-		{
+	public handleMouseButton(event: MouseEvent, code: string, pressed: boolean): void {
+		if (this.controlledObject !== undefined) {
 			this.controlledObject.handleMouseButton(event, code, pressed);
 		}
-		else
-		{
+		else {
 			for (const action in this.actions) {
 				if (this.actions.hasOwnProperty(action)) {
 					const binding = this.actions[action];
 
-					if (_.includes(binding.eventCodes, code))
-					{
+					if (_.includes(binding.eventCodes, code)) {
 						this.triggerAction(action, pressed);
 					}
 				}
@@ -331,37 +304,29 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void
-	{
-		if (this.controlledObject !== undefined)
-		{
+	public handleMouseMove(event: MouseEvent, deltaX: number, deltaY: number): void {
+		if (this.controlledObject !== undefined) {
 			this.controlledObject.handleMouseMove(event, deltaX, deltaY);
 		}
-		else
-		{
+		else {
 			this.world.cameraOperator.move(deltaX, deltaY);
 		}
 	}
-	
-	public handleMouseWheel(event: WheelEvent, value: number): void
-	{
-		if (this.controlledObject !== undefined)
-		{
+
+	public handleMouseWheel(event: WheelEvent, value: number): void {
+		if (this.controlledObject !== undefined) {
 			this.controlledObject.handleMouseWheel(event, value);
 		}
-		else
-		{
+		else {
 			this.world.scrollTheTimeScale(value);
 		}
 	}
 
-	public triggerAction(actionName: string, value: boolean): void
-	{
+	public triggerAction(actionName: string, value: boolean): void {
 		// Get action and set it's parameters
 		let action = this.actions[actionName];
 
-		if (action.isPressed !== value)
-		{
+		if (action.isPressed !== value) {
 			// Set value
 			action.isPressed = value;
 
@@ -382,20 +347,16 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public takeControl(): void
-	{
-		if (this.world !== undefined)
-		{
+	public takeControl(): void {
+		if (this.world !== undefined) {
 			this.world.inputManager.setInputReceiver(this);
 		}
-		else
-		{
+		else {
 			console.warn('Attempting to take control of a character that doesn\'t belong to a world.');
 		}
 	}
 
-	public resetControls(): void
-	{
+	public resetControls(): void {
 		for (const action in this.actions) {
 			if (this.actions.hasOwnProperty(action)) {
 				this.triggerAction(action, false);
@@ -403,8 +364,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public update(timeStep: number): void
-	{
+	public update(timeStep: number): void {
 		this.behaviour?.update(timeStep);
 		this.vehicleEntryInstance?.update(timeStep);
 		// console.log(this.occupyingSeat);
@@ -417,8 +377,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		if (this.mixer !== undefined) this.mixer.update(timeStep);
 
 		// Sync physics/graphics
-		if (this.physicsEnabled)
-		{
+		if (this.physicsEnabled) {
 			this.position.set(
 				this.characterCapsule.body.interpolatedPosition.x,
 				this.characterCapsule.body.interpolatedPosition.y,
@@ -427,19 +386,17 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 		else {
 			let newPos = new THREE.Vector3();
-			this.getWorldPosition(newPos);
+			(this as any).getWorldPosition(newPos);
 
 			this.characterCapsule.body.position.copy(Utils.cannonVector(newPos));
 			this.characterCapsule.body.interpolatedPosition.copy(Utils.cannonVector(newPos));
 		}
 
-		this.updateMatrixWorld();
+		(this as any).updateMatrixWorld();
 	}
 
-	public inputReceiverInit(): void
-	{
-		if (this.controlledObject !== undefined)
-		{
+	public inputReceiverInit(): void {
+		if (this.controlledObject !== undefined) {
 			this.controlledObject.inputReceiverInit();
 			return;
 		}
@@ -451,8 +408,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.displayControls();
 	}
 
-	public displayControls(): void
-	{
+	public displayControls(): void {
 		this.world.updateControls([
 			{
 				keys: ['W', 'A', 'S', 'D'],
@@ -481,31 +437,25 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		]);
 	}
 
-	public inputReceiverUpdate(timeStep: number): void
-	{
-		if (this.controlledObject !== undefined)
-		{
+	public inputReceiverUpdate(timeStep: number): void {
+		if (this.controlledObject !== undefined) {
 			this.controlledObject.inputReceiverUpdate(timeStep);
 		}
-		else
-		{
+		else {
 			// Look in camera's direction
 			this.viewVector = new THREE.Vector3().subVectors(this.position, this.world.camera.position);
-			this.getWorldPosition(this.world.cameraOperator.target);
+			(this as any).getWorldPosition(this.world.cameraOperator.target);
 		}
-		
+
 	}
 
-	public setAnimation(clipName: string, fadeIn: number): number
-	{
-		if (this.mixer !== undefined)
-		{
+	public setAnimation(clipName: string, fadeIn: number): number {
+		if (this.mixer !== undefined) {
 			// gltf
-			let clip = THREE.AnimationClip.findByName( this.animations, clipName );
+			let clip = THREE.AnimationClip.findByName(this.animations, clipName);
 
 			let action = this.mixer.clipAction(clip);
-			if (action === null)
-			{
+			if (action === null) {
 				console.error(`Animation ${clipName} not found!`);
 				return 0;
 			}
@@ -518,8 +468,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public springMovement(timeStep: number): void
-	{
+	public springMovement(timeStep: number): void {
 		// Simulator
 		this.velocitySimulator.target.copy(this.velocityTarget);
 		this.velocitySimulator.simulate(timeStep);
@@ -529,8 +478,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.acceleration.copy(this.velocitySimulator.velocity);
 	}
 
-	public springRotation(timeStep: number): void
-	{
+	public springRotation(timeStep: number): void {
 		// Spring rotation
 		// Figure out angle between current and target orientation
 		let angle = Utils.getSignedAngleBetweenVectors(this.orientation, this.orientationTarget);
@@ -545,8 +493,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.angularVelocity = this.rotationSimulator.velocity;
 	}
 
-	public getLocalMovementDirection(): THREE.Vector3
-	{
+	public getLocalMovementDirection(): THREE.Vector3 {
 		const positiveX = this.actions.right.isPressed ? -1 : 0;
 		const negativeX = this.actions.left.isPressed ? 1 : 0;
 		const positiveZ = this.actions.up.isPressed ? 1 : 0;
@@ -555,81 +502,65 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		return new THREE.Vector3(positiveX + negativeX, 0, positiveZ + negativeZ).normalize();
 	}
 
-	public getCameraRelativeMovementVector(): THREE.Vector3
-	{
+	public getCameraRelativeMovementVector(): THREE.Vector3 {
 		const localDirection = this.getLocalMovementDirection();
 		const flatViewVector = new THREE.Vector3(this.viewVector.x, 0, this.viewVector.z).normalize();
 
 		return Utils.appplyVectorMatrixXZ(flatViewVector, localDirection);
 	}
 
-	public setCameraRelativeOrientationTarget(): void
-	{
-		if (this.vehicleEntryInstance === null)
-		{
+	public setCameraRelativeOrientationTarget(): void {
+		if (this.vehicleEntryInstance === null) {
 			let moveVector = this.getCameraRelativeMovementVector();
-	
-			if (moveVector.x === 0 && moveVector.y === 0 && moveVector.z === 0)
-			{
+
+			if (moveVector.x === 0 && moveVector.y === 0 && moveVector.z === 0) {
 				this.setOrientation(this.orientation);
 			}
-			else
-			{
+			else {
 				this.setOrientation(moveVector);
 			}
 		}
 	}
 
-	public rotateModel(): void
-	{
-		this.lookAt(this.position.x + this.orientation.x, this.position.y + this.orientation.y, this.position.z + this.orientation.z);
+	public rotateModel(): void {
+		(this as any).lookAt(this.position.x + this.orientation.x, this.position.y + this.orientation.y, this.position.z + this.orientation.z);
 		this.tiltContainer.rotation.z = (-this.angularVelocity * 2.3 * this.velocity.length());
 		this.tiltContainer.position.setY((Math.cos(Math.abs(this.angularVelocity * 2.3 * this.velocity.length())) / 2) - 0.5);
 	}
 
-	public jump(initJumpSpeed: number = -1): void
-	{
+	public jump(initJumpSpeed: number = -1): void {
 		this.wantsToJump = true;
 		this.initJumpSpeed = initJumpSpeed;
 	}
 
-	public findVehicleToEnter(wantsToDrive: boolean): void
-	{
+	public findVehicleToEnter(wantsToDrive: boolean): void {
 		// reusable world position variable
 		let worldPos = new THREE.Vector3();
 
 		// Find best vehicle
 		let vehicleFinder = new ClosestObjectFinder<Vehicle>(this.position, 10);
-		this.world.vehicles.forEach((vehicle) =>
-		{
+		this.world.vehicles.forEach((vehicle) => {
 			vehicleFinder.consider(vehicle, vehicle.position);
 		});
 
-		if (vehicleFinder.closestObject !== undefined)
-		{
+		if (vehicleFinder.closestObject !== undefined) {
 			let vehicle = vehicleFinder.closestObject;
 			let vehicleEntryInstance = new VehicleEntryInstance(this);
 			vehicleEntryInstance.wantsToDrive = wantsToDrive;
 
 			// Find best seat
 			let seatFinder = new ClosestObjectFinder<VehicleSeat>(this.position);
-			for (const seat of vehicle.seats)
-			{
-				if (wantsToDrive)
-				{
+			for (const seat of vehicle.seats) {
+				if (wantsToDrive) {
 					// Consider driver seats
-					if (seat.type === SeatType.Driver)
-					{
+					if (seat.type === SeatType.Driver) {
 						seat.seatPointObject.getWorldPosition(worldPos);
 						seatFinder.consider(seat, worldPos);
 					}
 					// Consider passenger seats connected to driver seats
-					else if (seat.type === SeatType.Passenger)
-					{
-						for (const connSeat of seat.connectedSeats)
-						{
-							if (connSeat.type === SeatType.Driver)
-							{
+					else if (seat.type === SeatType.Passenger) {
+						for (const connSeat of seat.connectedSeats) {
+							if (connSeat.type === SeatType.Driver) {
 								seat.seatPointObject.getWorldPosition(worldPos);
 								seatFinder.consider(seat, worldPos);
 								break;
@@ -637,19 +568,16 @@ export class Character extends THREE.Object3D implements IWorldEntity
 						}
 					}
 				}
-				else
-				{
+				else {
 					// Consider passenger seats
-					if (seat.type === SeatType.Passenger)
-					{
+					if (seat.type === SeatType.Passenger) {
 						seat.seatPointObject.getWorldPosition(worldPos);
 						seatFinder.consider(seat, worldPos);
 					}
 				}
 			}
 
-			if (seatFinder.closestObject !== undefined)
-			{
+			if (seatFinder.closestObject !== undefined) {
 				let targetSeat = seatFinder.closestObject;
 				vehicleEntryInstance.targetSeat = targetSeat;
 
@@ -660,8 +588,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 					entryPointFinder.consider(point, worldPos);
 				}
 
-				if (entryPointFinder.closestObject !== undefined)
-				{
+				if (entryPointFinder.closestObject !== undefined) {
 					vehicleEntryInstance.entryPoint = entryPointFinder.closestObject;
 					this.triggerAction('up', true);
 					this.vehicleEntryInstance = vehicleEntryInstance;
@@ -670,22 +597,18 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public enterVehicle(seat: VehicleSeat, entryPoint: THREE.Object3D): void
-	{
+	public enterVehicle(seat: VehicleSeat, entryPoint: THREE.Object3D): void {
 		this.resetControls();
 
-		if (seat.door?.rotation < 0.5)
-		{
+		if (seat.door?.rotation < 0.5) {
 			this.setState(new OpenVehicleDoor(this, seat, entryPoint));
 		}
-		else
-		{
+		else {
 			this.setState(new EnteringVehicle(this, seat, entryPoint));
 		}
 	}
 
-	public teleportToVehicle(vehicle: Vehicle, seat: VehicleSeat): void
-	{
+	public teleportToVehicle(vehicle: Vehicle, seat: VehicleSeat): void {
 		this.resetVelocity();
 		this.rotateModel();
 		this.setPhysicsEnabled(false);
@@ -700,23 +623,20 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.startControllingVehicle(vehicle, seat);
 	}
 
-	public startControllingVehicle(vehicle: IControllable, seat: VehicleSeat): void
-	{
-		if (this.controlledObject !== vehicle)
-		{
+	public startControllingVehicle(vehicle: IControllable, seat: VehicleSeat): void {
+		if (this.controlledObject !== vehicle) {
 			this.transferControls(vehicle);
 			this.resetControls();
-	
+
 			this.controlledObject = vehicle;
 			this.controlledObject.allowSleep(false);
 			vehicle.inputReceiverInit();
-	
+
 			vehicle.controllingCharacter = this;
 		}
 	}
 
-	public transferControls(entity: IControllable): void
-	{
+	public transferControls(entity: IControllable): void {
 		// Currently running through all actions of this character and the vehicle,
 		// comparing keycodes of actions and based on that triggering vehicle's actions
 		// Maybe we should ask input manager what's the current state of the keyboard
@@ -731,8 +651,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 
 						a1.eventCodes.forEach((code1) => {
 							a2.eventCodes.forEach((code2) => {
-								if (code1 === code2)
-								{
+								if (code1 === code2) {
 									entity.triggerAction(action2, a1.isPressed);
 								}
 							});
@@ -743,10 +662,8 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public stopControllingVehicle(): void
-	{
-		if (this.controlledObject?.controllingCharacter === this)
-		{
+	public stopControllingVehicle(): void {
+		if (this.controlledObject?.controllingCharacter === this) {
 			this.controlledObject.allowSleep(true);
 			this.controlledObject.controllingCharacter = undefined;
 			this.controlledObject.resetControls();
@@ -755,61 +672,50 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public exitVehicle(): void
-	{
-		if (this.occupyingSeat !== null)
-		{
-			if (this.occupyingSeat.vehicle.entityType === EntityType.Airplane)
-			{
+	public exitVehicle(): void {
+		if (this.occupyingSeat !== null) {
+			if (this.occupyingSeat.vehicle.entityType === EntityType.Airplane) {
 				this.setState(new ExitingAirplane(this, this.occupyingSeat));
 			}
-			else
-			{
+			else {
 				this.setState(new ExitingVehicle(this, this.occupyingSeat));
 			}
-			
+
 			this.stopControllingVehicle();
 		}
 	}
 
-	public occupySeat(seat: VehicleSeat): void
-	{
+	public occupySeat(seat: VehicleSeat): void {
 		this.occupyingSeat = seat;
 		seat.occupiedBy = this;
 	}
 
-	public leaveSeat(): void
-	{
-		if (this.occupyingSeat !== null)
-		{
+	public leaveSeat(): void {
+		if (this.occupyingSeat !== null) {
 			this.occupyingSeat.occupiedBy = null;
 			this.occupyingSeat = null;
 		}
 	}
 
-	public physicsPreStep(body: CANNON.Body, character: Character): void
-	{
+	public physicsPreStep(body: CANNON.Body, character: Character): void {
 		character.feetRaycast();
 
 		// Raycast debug
-		if (character.rayHasHit)
-		{
+		if (character.rayHasHit) {
 			if (character.raycastBox.visible) {
 				character.raycastBox.position.x = character.rayResult.hitPointWorld.x;
 				character.raycastBox.position.y = character.rayResult.hitPointWorld.y;
 				character.raycastBox.position.z = character.rayResult.hitPointWorld.z;
 			}
 		}
-		else
-		{
+		else {
 			if (character.raycastBox.visible) {
 				character.raycastBox.position.set(body.position.x, body.position.y - character.rayCastLength - character.raySafeOffset, body.position.z);
 			}
 		}
 	}
 
-	public feetRaycast(): void
-	{
+	public feetRaycast(): void {
 		// Player ray casting
 		// Create ray
 		let body = this.characterCapsule.body;
@@ -824,8 +730,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		this.rayHasHit = this.world.physicsWorld.raycastClosest(start, end, rayCastOptions, this.rayResult);
 	}
 
-	public physicsPostStep(body: CANNON.Body, character: Character): void
-	{
+	public physicsPostStep(body: CANNON.Body, character: Character): void {
 		// Get velocities
 		let simulatedVelocity = new THREE.Vector3(body.velocity.x, body.velocity.y, body.velocity.z);
 
@@ -837,8 +742,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		let newVelocity = new THREE.Vector3();
 
 		// Additive velocity mode
-		if (character.arcadeVelocityIsAdditive)
-		{
+		if (character.arcadeVelocityIsAdditive) {
 			newVelocity.copy(simulatedVelocity);
 
 			let globalVelocityTarget = Utils.appplyVectorMatrixXZ(character.orientation, character.velocityTarget);
@@ -848,8 +752,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			if (Math.abs(simulatedVelocity.y) < Math.abs(globalVelocityTarget.y * character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.y, arcadeVelocity.y)) { newVelocity.y += add.y; }
 			if (Math.abs(simulatedVelocity.z) < Math.abs(globalVelocityTarget.z * character.moveSpeed) || Utils.haveDifferentSigns(simulatedVelocity.z, arcadeVelocity.z)) { newVelocity.z += add.z; }
 		}
-		else
-		{
+		else {
 			newVelocity = new THREE.Vector3(
 				THREE.MathUtils.lerp(simulatedVelocity.x, arcadeVelocity.x, character.arcadeVelocityInfluence.x),
 				THREE.MathUtils.lerp(simulatedVelocity.y, arcadeVelocity.y, character.arcadeVelocityInfluence.y),
@@ -858,14 +761,12 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 
 		// If we're hitting the ground, stick to ground
-		if (character.rayHasHit)
-		{
+		if (character.rayHasHit) {
 			// Flatten velocity
 			newVelocity.y = 0;
 
 			// Move on top of moving objects
-			if (character.rayResult.body.mass > 0)
-			{
+			if (character.rayResult.body.mass > 0) {
 				let pointVelocity = new CANNON.Vec3();
 				character.rayResult.body.getVelocityAtWorldPoint(character.rayResult.hitPointWorld, pointVelocity);
 				newVelocity.add(Utils.threeVector(pointVelocity));
@@ -891,8 +792,7 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			// Ground character
 			body.position.y = character.rayResult.hitPointWorld.y + character.rayCastLength + (newVelocity.y / character.world.physicsFrameRate);
 		}
-		else
-		{
+		else {
 			// If we're in air
 			body.velocity.x = newVelocity.x;
 			body.velocity.y = newVelocity.y;
@@ -905,11 +805,9 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 
 		// Jumping
-		if (character.wantsToJump)
-		{
+		if (character.wantsToJump) {
 			// If initJumpSpeed is set
-			if (character.initJumpSpeed > -1)
-			{
+			if (character.initJumpSpeed > -1) {
 				// Flatten velocity
 				body.velocity.y = 0;
 				let speed = Math.max(character.velocitySimulator.position.length() * 4, character.initJumpSpeed);
@@ -931,14 +829,11 @@ export class Character extends THREE.Object3D implements IWorldEntity
 		}
 	}
 
-	public addToWorld(world: World): void
-	{
-		if (_.includes(world.characters, this))
-		{
+	public addToWorld(world: World): void {
+		if (_.includes(world.characters, this)) {
 			console.warn('Adding character to a world in which it already exists.');
 		}
-		else
-		{
+		else {
 			// Set world
 			this.world = world;
 
@@ -953,23 +848,18 @@ export class Character extends THREE.Object3D implements IWorldEntity
 			world.graphicsWorld.add(this.raycastBox);
 
 			// Shadow cascades
-			this.materials.forEach((mat) =>
-			{
+			this.materials.forEach((mat) => {
 				world.sky.csm.setupMaterial(mat);
 			});
 		}
 	}
 
-	public removeFromWorld(world: World): void
-	{
-		if (!_.includes(world.characters, this))
-		{
+	public removeFromWorld(world: World): void {
+		if (!_.includes(world.characters, this)) {
 			console.warn('Removing character from a world in which it isn\'t present.');
 		}
-		else
-		{
-			if (world.inputManager.inputReceiver === this)
-			{
+		else {
+			if (world.inputManager.inputReceiver === this) {
 				world.inputManager.inputReceiver = undefined;
 			}
 

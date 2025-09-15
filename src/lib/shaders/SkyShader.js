@@ -18,7 +18,7 @@ const THREE = require('three');
 export let SkyShader = {
 
     uniforms: {
-      luminance: {value: 1},
+      skyLuminance: {value: 1},
       turbidity: {value: 2},
       rayleigh: {value: 1},
       mieCoefficient: {value: 0.005},
@@ -109,7 +109,7 @@ export let SkyShader = {
       varying vec3 vBetaM;
       varying float vSunE;
   
-      uniform float luminance;
+      uniform float skyLuminance;
       uniform float mieDirectionalG;
       uniform vec3 cameraPos;
   
@@ -192,7 +192,7 @@ export let SkyShader = {
   
       	vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );
   
-      	//vec3 curr = Uncharted2Tonemap( ( log2( 2.0 / pow( luminance, 4.0 ) ) ) * texColor );
+      	//vec3 curr = Uncharted2Tonemap( ( log2( 2.0 / pow( skyLuminance, 4.0 ) ) ) * texColor );
         // vec3 color = texColor * whiteScale;
         vec3 color = texColor * 0.3;
   

@@ -5,9 +5,11 @@ import { EntityType } from '../enums/EntityType';
 import { IUpdatable } from '../interfaces/IUpdatable';
 import { default as CSM } from 'three-csm';
 
-export class Sky extends THREE.Object3D implements IUpdatable
-{
+export class Sky extends THREE.Object3D implements IUpdatable {
 	public updateOrder: number = 5;
+
+	// Explicitly declare inherited properties for TypeScript
+	public position: THREE.Vector3;
 
 	public sunPosition: THREE.Vector3 = new THREE.Vector3();
 	public csm: CSM;
@@ -35,12 +37,11 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 	private world: World;
 
-	constructor(world: World)
-	{
+	constructor(world: World) {
 		super();
 
 		this.world = world;
-		
+
 		// Sky material
 		this.skyMaterial = new THREE.ShaderMaterial({
 			uniforms: THREE.UniformsUtils.clone(SkyShader.uniforms),
@@ -51,18 +52,18 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 		// Mesh
 		this.skyMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(1000, 24, 12),
+			new THREE.SphereGeometry(1000, 24, 12),
 			this.skyMaterial
 		);
-		this.attach(this.skyMesh);
+		(this as any).add(this.skyMesh);
 
 		// Ambient light
-		this.hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.0 );
+		this.hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.0);
 		this.refreshHemiIntensity();
-		this.hemiLight.color.setHSL( 0.59, 0.4, 0.6 );
-		this.hemiLight.groundColor.setHSL( 0.095, 0.2, 0.75 );
-		this.hemiLight.position.set( 0, 50, 0 );
-		this.world.graphicsWorld.add( this.hemiLight );
+		this.hemiLight.color.setHSL(0.59, 0.4, 0.6);
+		this.hemiLight.groundColor.setHSL(0.095, 0.2, 0.75);
+		this.hemiLight.position.set(0, 50, 0);
+		this.world.graphicsWorld.add(this.hemiLight);
 
 		// CSM
 		// New version
@@ -75,12 +76,10 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		// };
 
 		// Legacy
-		let splitsCallback = (amount, near, far) =>
-		{
+		let splitsCallback = (amount, near, far) => {
 			let arr = [];
 
-			for (let i = amount - 1; i >= 0; i--)
-			{
+			for (let i = amount - 1; i >= 0; i--) {
 				arr.push(Math.pow(1 / 4, i));
 			}
 
@@ -88,8 +87,6 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		};
 
 		this.csm = new CSM({
-			fov: 80,
-			far: 250,	// maxFar
 			lightIntensity: 2.5,
 			cascades: 3,
 			shadowMapSize: 2048,
@@ -101,22 +98,20 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		this.csm.fade = true;
 
 		this.refreshSunPosition();
-		
+
 		world.graphicsWorld.add(this);
 		world.registerUpdatable(this);
 	}
 
-	public update(timeScale: number): void
-	{
+	public update(timeScale: number): void {
 		this.position.copy(this.world.camera.position);
 		this.refreshSunPosition();
 
-		this.csm.update(this.world.camera.matrix);
+		this.csm.update();
 		this.csm.lightDirection = new THREE.Vector3(-this.sunPosition.x, -this.sunPosition.y, -this.sunPosition.z).normalize();
 	}
 
-	public refreshSunPosition(): void
-	{
+	public refreshSunPosition(): void {
 		const sunDistance = 10;
 
 		this.sunPosition.x = sunDistance * Math.sin(this._theta * Math.PI / 180) * Math.cos(this._phi * Math.PI / 180);
@@ -127,8 +122,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		this.skyMaterial.uniforms.cameraPos.value.copy(this.world.camera.position);
 	}
 
-	public refreshHemiIntensity(): void
-	{
+	public refreshHemiIntensity(): void {
 		this.hemiLight.intensity = this.minHemiIntensity + Math.pow(1 - (Math.abs(this._phi - 90) / 90), 0.25) * (this.maxHemiIntensity - this.minHemiIntensity);
 	}
 }

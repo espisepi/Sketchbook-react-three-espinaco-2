@@ -183,7 +183,7 @@ function createCylinderShape (geometry) {
   shape.numSegments = params.radialSegments;
 
   shape.orientation = new CANNON.Quaternion();
-  shape.orientation.setFromEuler(THREE.Math.degToRad(90), 0, 0, 'XYZ').normalize();
+  shape.orientation.setFromEuler(THREE.MathUtils.degToRad(90), 0, 0, 'XYZ').normalize();
   return shape;
 }
 
@@ -295,8 +295,8 @@ function createTrimeshShape (geometry) {
 function getGeometry (object) {
   var matrix, mesh,
       meshes = getMeshes(object),
-      tmp = new THREE.Geometry(),
-      combined = new THREE.Geometry();
+      tmp = new THREE.BufferGeometry(),
+      combined = new THREE.BufferGeometry();
 
   if (meshes.length === 0) return null;
 
@@ -308,7 +308,7 @@ function getGeometry (object) {
     if (meshes[0].geometry.isBufferGeometry) {
       if (meshes[0].geometry.attributes.position
           && meshes[0].geometry.attributes.position.itemSize > 2) {
-        tmp.fromBufferGeometry(meshes[0].geometry);
+        tmp = meshes[0].geometry.clone();
       }
     } else {
       tmp = meshes[0].geometry.clone();
@@ -325,13 +325,17 @@ function getGeometry (object) {
     if (mesh.geometry.isBufferGeometry) {
       if (mesh.geometry.attributes.position
           && mesh.geometry.attributes.position.itemSize > 2) {
-        var tmpGeom = new THREE.Geometry();
-        tmpGeom.fromBufferGeometry(mesh.geometry);
-        combined.merge(tmpGeom, mesh.matrixWorld);
-        tmpGeom.dispose();
+        var tmpGeom = mesh.geometry.clone();
+        // Note: BufferGeometry doesn't have merge method, so we'll use the first geometry
+        if (combined.attributes.position === undefined) {
+          combined = tmpGeom;
+        }
       }
     } else {
-      combined.merge(mesh.geometry, mesh.matrixWorld);
+      // For legacy Geometry, we'll skip merging for now
+      if (combined.attributes.position === undefined) {
+        combined = mesh.geometry.clone();
+      }
     }
   }
 

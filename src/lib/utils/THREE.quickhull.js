@@ -310,8 +310,28 @@ export const quickhull = (function(){
 
     reset();
 
-
-    points    = geometry.vertices;
+    // Handle both Geometry and BufferGeometry
+    if (geometry.isBufferGeometry) {
+      // Convert BufferGeometry to work with QuickHull
+      var positionAttribute = geometry.getAttribute('position');
+      if (!positionAttribute) {
+        console.warn('QuickHull: BufferGeometry must have position attribute');
+        return geometry;
+      }
+      
+      points = [];
+      for (var i = 0; i < positionAttribute.count; i++) {
+        points.push(new THREE.Vector3(
+          positionAttribute.getX(i),
+          positionAttribute.getY(i),
+          positionAttribute.getZ(i)
+        ));
+      }
+    } else {
+      // Legacy Geometry
+      points = geometry.vertices;
+    }
+    
     faces     = [],
     faceStack   = [],
     i       = NUM_POINTS = points.length,
@@ -437,15 +457,79 @@ export const quickhull = (function(){
 
 
     //  Assign to our geometry object
-
-    var ll = faces.length;
-    while( ll-- > 0 ){
-      geometry.faces[ll] = new THREE.Face3( faces[ll][2], faces[ll][1], faces[ll][0], faces[ll].normal )
+    if (geometry.isBufferGeometry) {
+      // For BufferGeometry, we need to create new geometry with the computed faces
+      var vertices = [];
+      var indices = [];
+      
+      // Extract vertices from faces
+      var vertexMap = new Map();
+      var vertexIndex = 0;
+      
+      for (var ll = 0; ll < faces.length; ll++) {
+        var face = faces[ll];
+        var faceIndices = [];
+        
+        for (var k = 0; k < 3; k++) {
+          var vertex = face[k];
+          var key = vertex.x + ',' + vertex.y + ',' + vertex.z;
+          
+          if (!vertexMap.has(key)) {
+            vertexMap.set(key, vertexIndex++);
+            vertices.push(vertex.x, vertex.y, vertex.z);
+          }
+          
+          faceIndices.push(vertexMap.get(key));
+        }
+        
+        indices.push(faceIndices[2], faceIndices[1], faceIndices[0]); // Reverse winding
+      }
+      
+      // Create new BufferGeometry
+      var newGeometry = new THREE.BufferGeometry();
+      newGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      newGeometry.setIndex(indices);
+      newGeometry.computeVertexNormals();
+      
+      return newGeometry;
+    } else {
+      // Legacy Geometry - create a simple BufferGeometry instead
+      console.warn('QuickHull: Legacy Geometry support is deprecated. Converting to BufferGeometry.');
+      
+      var vertices = [];
+      var indices = [];
+      
+      // Extract vertices from faces
+      var vertexMap = new Map();
+      var vertexIndex = 0;
+      
+      for (var ll = 0; ll < faces.length; ll++) {
+        var face = faces[ll];
+        var faceIndices = [];
+        
+        for (var k = 0; k < 3; k++) {
+          var vertex = face[k];
+          var key = vertex.x + ',' + vertex.y + ',' + vertex.z;
+          
+          if (!vertexMap.has(key)) {
+            vertexMap.set(key, vertexIndex++);
+            vertices.push(vertex.x, vertex.y, vertex.z);
+          }
+          
+          faceIndices.push(vertexMap.get(key));
+        }
+        
+        indices.push(faceIndices[2], faceIndices[1], faceIndices[0]); // Reverse winding
+      }
+      
+      // Create new BufferGeometry
+      var newGeometry = new THREE.BufferGeometry();
+      newGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      newGeometry.setIndex(indices);
+      newGeometry.computeVertexNormals();
+      
+      return newGeometry;
     }
-
-    geometry.normalsNeedUpdate = true;
-
-    return geometry;
 
   }
 
