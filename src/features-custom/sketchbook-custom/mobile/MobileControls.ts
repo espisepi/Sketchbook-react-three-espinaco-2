@@ -63,6 +63,13 @@ export class MobileControls
 		up: false, down: false, left: false, right: false
 	};
 
+	// Camera keyboard state (IJKL keys)
+	private camKeyState: { up: boolean; down: boolean; left: boolean; right: boolean } = {
+		up: false, down: false, left: false, right: false
+	};
+	private boundCamKeyDown: (e: KeyboardEvent) => void;
+	private boundCamKeyUp: (e: KeyboardEvent) => void;
+
 	// Configuration
 	private static readonly DEAD_ZONE: number = 0.15;
 	private static readonly CAM_SPEED: number = 5;
@@ -106,6 +113,12 @@ export class MobileControls
 
 		// Toggle button (always visible)
 		this.createToggleButton();
+
+		// Keyboard camera controls (IJKL) — always active
+		this.boundCamKeyDown = this.onCameraKeyDown.bind(this);
+		this.boundCamKeyUp = this.onCameraKeyUp.bind(this);
+		document.addEventListener('keydown', this.boundCamKeyDown);
+		document.addEventListener('keyup', this.boundCamKeyUp);
 	}
 
 	// ── Toggle visibility ──────────────────
@@ -174,9 +187,15 @@ export class MobileControls
 
 	public update(): void
 	{
-		if (!this.initialized || !this.visible) return;
-		this.processMovement();
+		if (!this.initialized) return;
+
+		// Camera input (IJKL keyboard + joystick) always processes,
+		// even when visual controls are hidden
 		this.processCamera();
+
+		// Movement joystick only when controls are visible
+		if (!this.visible) return;
+		this.processMovement();
 	}
 
 	/**
@@ -208,18 +227,64 @@ export class MobileControls
 	}
 
 	/**
-	 * Convert camera joystick position into camera rotation.
+	 * Convert camera inputs into camera rotation.
+	 * Combines the right joystick (when visible) and IJKL keyboard (always).
 	 * Directly calls cameraOperator.move() for smooth control.
 	 */
 	private processCamera(): void
 	{
-		if (!this.camJoy.isActive) return;
 		if (!this.world.cameraOperator) return;
 
+		let cx = 0;
+		let cy = 0;
+
+		// Joystick contribution (only when controls are visible)
+		if (this.visible && this.camJoy.isActive)
+		{
+			cx += this.camJoy.x;
+			cy += this.camJoy.y;
+		}
+
+		// Keyboard contribution (IJKL — always active)
+		if (this.camKeyState.right) cx += 1;
+		if (this.camKeyState.left)  cx -= 1;
+		if (this.camKeyState.up)    cy += 1;
+		if (this.camKeyState.down)  cy -= 1;
+
+		if (cx === 0 && cy === 0) return;
+
+		// Clamp combined input to [-1, 1]
+		if (cx > 1) cx = 1; else if (cx < -1) cx = -1;
+		if (cy > 1) cy = 1; else if (cy < -1) cy = -1;
+
 		this.world.cameraOperator.move(
-			this.camJoy.x * MobileControls.CAM_SPEED,
-			this.camJoy.y * MobileControls.CAM_SPEED
+			cx * MobileControls.CAM_SPEED,
+			cy * MobileControls.CAM_SPEED
 		);
+	}
+
+	// ── Camera keyboard handlers (IJKL) ───
+
+	private onCameraKeyDown(e: KeyboardEvent): void
+	{
+		switch (e.code)
+		{
+			case 'KeyI': this.camKeyState.up    = true; break;
+			case 'KeyK': this.camKeyState.down  = true; break;
+			case 'KeyJ': this.camKeyState.left  = true; break;
+			case 'KeyL': this.camKeyState.right = true; break;
+		}
+	}
+
+	private onCameraKeyUp(e: KeyboardEvent): void
+	{
+		switch (e.code)
+		{
+			case 'KeyI': this.camKeyState.up    = false; break;
+			case 'KeyK': this.camKeyState.down  = false; break;
+			case 'KeyJ': this.camKeyState.left  = false; break;
+			case 'KeyL': this.camKeyState.right = false; break;
+		}
 	}
 
 	// ── Key event dispatch ─────────────────
@@ -421,6 +486,8 @@ export class MobileControls
 		{
 			this.activeBtns[i].destroy();
 		}
+		document.removeEventListener('keydown', this.boundCamKeyDown);
+		document.removeEventListener('keyup', this.boundCamKeyUp);
 		this.container.remove();
 		this.initialized = false;
 	}
