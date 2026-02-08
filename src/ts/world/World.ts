@@ -67,7 +67,7 @@ export class World {
 
   private lastScenarioID: string;
 
-  public isVideoTextureReplacing: boolean = false;
+  public isVideoTextureReplacing: boolean = true;
   public isProceduralTerrain: boolean = true;
 
   constructor(worldScenePath?: any) {
@@ -197,13 +197,13 @@ export class World {
       });
 
       // sepinaco: replace textures by videoclip
-      if(this.isVideoTextureReplacing) {
+      if (this.isVideoTextureReplacing) {
         const replaceTextureVideoclip = new ReplaceTextureVideoclip(this);
         this.registerUpdatable(replaceTextureVideoclip);
       }
 
       // sepinaco: init procedural terrain
-      if(this.isProceduralTerrain) {
+      if (this.isProceduralTerrain) {
         const proceduralTerrainWorld = new ProceduralTerrainWorld(this);
       }
 
