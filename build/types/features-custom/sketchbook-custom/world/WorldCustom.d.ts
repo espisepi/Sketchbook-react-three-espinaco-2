@@ -1,29 +1,19 @@
 import { World } from '../../../ts/sketchbook';
 interface Control {
-    desc: String;
-    keys: Array<String>;
-}
-interface JoystickState {
-    joystick: any;
-    isMove: boolean;
-    velocityMove: number;
-    position: Position;
-}
-interface Position {
-    x: number;
-    y: number;
+    desc: string;
+    keys: string[];
 }
 export declare class WorldCustom extends World {
-    joystickState: JoystickState;
+    private mobileControls;
     constructor(worldScenePath?: any);
+    /**
+     * Called whenever the active entity changes (character ↔ vehicle ↔ camera).
+     * Forwards the control descriptors to mobile controls so buttons can adapt.
+     */
     updateControls(controls: Array<Control>): void;
-    private renderUIMobileButtons;
-    private renderMovementButtons;
-    private renderMovementButtonUp;
-    private renderMovementButtonDown;
-    private renderMovementButtonLeft;
-    private renderMovementButtonRight;
-    private renderJoystickCameraMovement;
+    /**
+     * Main update loop. Processes mobile joystick inputs each frame.
+     */
     update(timeStep: number, unscaledTimeStep: number): void;
 }
 export {};
