@@ -55,8 +55,11 @@ export class MobileControls
 	private btnContainer: HTMLDivElement;
 	private activeBtns: TouchButton[] = [];
 
-	// Toggle button
+	// Top bar (toggle + speed slider)
+	private topBar: HTMLDivElement;
 	private toggleBtn: HTMLButtonElement;
+	private speedSlider: HTMLInputElement;
+	private speedValue: HTMLSpanElement;
 
 	// Movement key state tracking (prevents duplicate dispatches)
 	private moveState: { up: boolean; down: boolean; left: boolean; right: boolean } = {
@@ -72,7 +75,10 @@ export class MobileControls
 
 	// Configuration
 	private static readonly DEAD_ZONE: number = 0.15;
-	private static readonly CAM_SPEED: number = 5;
+	private camSpeed: number = 5;
+	private static readonly CAM_SPEED_MIN: number = 1;
+	private static readonly CAM_SPEED_MAX: number = 15;
+	private static readonly CAM_SPEED_STEP: number = 0.5;
 
 	constructor(world: World)
 	{
@@ -111,8 +117,8 @@ export class MobileControls
 		this.btnContainer.setAttribute('aria-label', 'Action buttons');
 		this.container.appendChild(this.btnContainer);
 
-		// Toggle button (always visible)
-		this.createToggleButton();
+		// Top bar: toggle button + camera speed slider (always visible)
+		this.createTopBar();
 
 		// Keyboard camera controls (IJKL) — always active
 		this.boundCamKeyDown = this.onCameraKeyDown.bind(this);
@@ -123,8 +129,15 @@ export class MobileControls
 
 	// ── Toggle visibility ──────────────────
 
-	private createToggleButton(): void
+	private createTopBar(): void
 	{
+		// Top bar container
+		this.topBar = document.createElement('div');
+		this.topBar.className = 'mc-topbar';
+		this.topBar.setAttribute('role', 'toolbar');
+		this.topBar.setAttribute('aria-label', 'Controls toolbar');
+
+		// ── Toggle button ──
 		this.toggleBtn = document.createElement('button');
 		this.toggleBtn.className = 'mc-toggle';
 		this.toggleBtn.setAttribute('aria-label', 'Toggle on-screen controls');
@@ -142,7 +155,58 @@ export class MobileControls
 			'</svg>';
 
 		this.toggleBtn.addEventListener('click', () => { this.toggle(); });
-		this.container.appendChild(this.toggleBtn);
+		this.topBar.appendChild(this.toggleBtn);
+
+		// ── Camera speed slider ──
+		const speedGroup = document.createElement('div');
+		speedGroup.className = 'mc-speed';
+		speedGroup.setAttribute('role', 'group');
+		speedGroup.setAttribute('aria-label', 'Camera speed');
+
+		// Camera icon label
+		const speedIcon = document.createElement('label');
+		speedIcon.className = 'mc-speed__icon';
+		speedIcon.setAttribute('for', 'mc-speed-input');
+		speedIcon.title = 'Camera speed';
+		speedIcon.innerHTML =
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+				'<circle cx="12" cy="12" r="3"/>' +
+				'<path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>' +
+			'</svg>';
+		speedGroup.appendChild(speedIcon);
+
+		// Range slider
+		this.speedSlider = document.createElement('input');
+		this.speedSlider.type = 'range';
+		this.speedSlider.id = 'mc-speed-input';
+		this.speedSlider.className = 'mc-speed__slider';
+		this.speedSlider.min = String(MobileControls.CAM_SPEED_MIN);
+		this.speedSlider.max = String(MobileControls.CAM_SPEED_MAX);
+		this.speedSlider.step = String(MobileControls.CAM_SPEED_STEP);
+		this.speedSlider.value = String(this.camSpeed);
+		this.speedSlider.setAttribute('aria-label', 'Camera rotation speed');
+		this.speedSlider.setAttribute('aria-valuemin', String(MobileControls.CAM_SPEED_MIN));
+		this.speedSlider.setAttribute('aria-valuemax', String(MobileControls.CAM_SPEED_MAX));
+		this.speedSlider.setAttribute('aria-valuenow', String(this.camSpeed));
+		speedGroup.appendChild(this.speedSlider);
+
+		// Numeric value display
+		this.speedValue = document.createElement('span');
+		this.speedValue.className = 'mc-speed__value';
+		this.speedValue.textContent = String(this.camSpeed);
+		this.speedValue.setAttribute('aria-hidden', 'true');
+		speedGroup.appendChild(this.speedValue);
+
+		// Input handler
+		this.speedSlider.addEventListener('input', () =>
+		{
+			this.camSpeed = parseFloat(this.speedSlider.value);
+			this.speedValue.textContent = String(this.camSpeed);
+			this.speedSlider.setAttribute('aria-valuenow', String(this.camSpeed));
+		});
+
+		this.topBar.appendChild(speedGroup);
+		this.container.appendChild(this.topBar);
 	}
 
 	public toggle(): void
@@ -258,8 +322,8 @@ export class MobileControls
 		if (cy > 1) cy = 1; else if (cy < -1) cy = -1;
 
 		this.world.cameraOperator.move(
-			cx * MobileControls.CAM_SPEED,
-			cy * MobileControls.CAM_SPEED
+			cx * this.camSpeed,
+			cy * this.camSpeed
 		);
 	}
 
@@ -522,13 +586,23 @@ export class MobileControls
 	-webkit-tap-highlight-color: transparent;
 }
 
-/* ── Toggle Button ───────────────────── */
+/* ── Top Bar ─────────────────────────── */
 
-.mc-toggle {
+.mc-topbar {
 	position: absolute;
 	top: 10px;
 	left: 50%;
 	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	pointer-events: auto;
+	z-index: 110;
+}
+
+/* ── Toggle Button ───────────────────── */
+
+.mc-toggle {
 	width: 42px;
 	height: 42px;
 	border-radius: 50%;
@@ -544,8 +618,8 @@ export class MobileControls
 	outline: none;
 	-webkit-appearance: none;
 	appearance: none;
-	z-index: 110;
 	padding: 0;
+	flex-shrink: 0;
 }
 
 .mc-toggle:hover {
@@ -571,15 +645,101 @@ export class MobileControls
 	opacity: 1;
 }
 
+/* ── Camera Speed Slider ─────────────── */
+
+.mc-speed {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: rgba(0, 0, 0, 0.35);
+	border: 2px solid rgba(255, 255, 255, 0.18);
+	border-radius: 21px;
+	padding: 4px 10px 4px 8px;
+	height: 36px;
+	box-sizing: border-box;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.mc-speed:hover {
+	background: rgba(0, 0, 0, 0.50);
+	border-color: rgba(255, 255, 255, 0.35);
+}
+
+.mc-speed__icon {
+	display: flex;
+	align-items: center;
+	color: rgba(255, 255, 255, 0.7);
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+.mc-speed__slider {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 80px;
+	height: 4px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 2px;
+	outline: none;
+	cursor: pointer;
+	margin: 0;
+}
+
+.mc-speed__slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 38% 32%, rgba(255,255,255,0.95), rgba(255,255,255,0.70));
+	border: none;
+	cursor: pointer;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.mc-speed__slider::-moz-range-thumb {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 38% 32%, rgba(255,255,255,0.95), rgba(255,255,255,0.70));
+	border: none;
+	cursor: pointer;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.mc-speed__slider::-moz-range-track {
+	height: 4px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 2px;
+	border: none;
+}
+
+.mc-speed__slider:focus-visible {
+	outline: 2px solid #5bf;
+	outline-offset: 2px;
+}
+
+.mc-speed__value {
+	color: rgba(255, 255, 255, 0.85);
+	font-family: monospace;
+	font-size: 12px;
+	min-width: 22px;
+	text-align: center;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
 /* ── Hidden state (hides joysticks + actions) ── */
 
 #mc-overlay .mc-joy,
-#mc-overlay .mc-actions {
+#mc-overlay .mc-actions,
+#mc-overlay .mc-speed {
 	transition: opacity 0.2s ease;
 }
 
 .mc-overlay--hidden .mc-joy,
-.mc-overlay--hidden .mc-actions {
+.mc-overlay--hidden .mc-actions,
+.mc-overlay--hidden .mc-speed {
 	opacity: 0;
 	pointer-events: none !important;
 }

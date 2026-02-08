@@ -48,7 +48,14 @@
 	.mc-toggle {
 		width: 36px !important;
 		height: 36px !important;
+	}
+
+	.mc-topbar {
 		top: 6px !important;
+	}
+
+	.mc-speed__slider {
+		width: 60px !important;
 	}
 }
 
