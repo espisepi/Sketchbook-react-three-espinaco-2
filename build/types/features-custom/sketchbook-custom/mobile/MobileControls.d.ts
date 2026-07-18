@@ -1,9 +1,12 @@
 /**
- * MobileControls - Touch-based UI for mobile devices
+ * MobileControls - On-screen game controls overlay
  *
  * Provides two virtual joysticks (movement + camera) and contextual
  * action buttons that adapt to the current control mode (character,
  * car, airplane, helicopter, free camera).
+ *
+ * Works on both desktop (mouse) and mobile (touch).
+ * Can be toggled on/off with a persistent button.
  *
  * Movement joystick → dispatches synthetic WASD KeyboardEvents
  * Camera joystick   → directly calls cameraOperator.move()
@@ -20,17 +23,31 @@ export declare class MobileControls {
     private world;
     private container;
     private initialized;
+    private visible;
     private moveJoy;
     private camJoy;
     private btnContainer;
     private activeBtns;
+    private topBar;
+    private toggleBtn;
+    private speedSlider;
+    private speedValue;
     private moveState;
+    private camKeyState;
+    private boundCamKeyDown;
+    private boundCamKeyUp;
     private static readonly DEAD_ZONE;
-    private static readonly CAM_SPEED;
+    private camSpeed;
+    private static readonly CAM_SPEED_MIN;
+    private static readonly CAM_SPEED_MAX;
+    private static readonly CAM_SPEED_STEP;
     constructor(world: World);
-    private isTouchDevice;
     private init;
     private createOverlay;
+    private createTopBar;
+    toggle(): void;
+    show(): void;
+    hide(): void;
     update(): void;
     /**
      * Convert movement joystick position into WASD key events.
@@ -39,10 +56,13 @@ export declare class MobileControls {
     private processMovement;
     private toggleMoveKey;
     /**
-     * Convert camera joystick position into camera rotation.
+     * Convert camera inputs into camera rotation.
+     * Combines the right joystick (when visible) and IJKL keyboard (always).
      * Directly calls cameraOperator.move() for smooth control.
      */
     private processCamera;
+    private onCameraKeyDown;
+    private onCameraKeyUp;
     private emitKey;
     /**
      * Called when the active entity changes (character ↔ vehicle ↔ camera).

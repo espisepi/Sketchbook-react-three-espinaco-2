@@ -1,12 +1,11 @@
 import { World } from "../World";
 import { ProceduralTerrain } from "./ProceduralTerrain";
 
-
-
 export class ProceduralTerrainWorld {
+    public terrain: ProceduralTerrain;
 
     constructor(world: World) {
         console.log("INIT ProceduralTerrainWorld ------------- ");
-        const proceduralTerrain = new ProceduralTerrain();
+        this.terrain = new ProceduralTerrain(world);
     }
 }

@@ -69,6 +69,7 @@ export class World {
 
   public isVideoTextureReplacing: boolean = true;
   public isProceduralTerrain: boolean = true;
+  public proceduralTerrainWorld: ProceduralTerrainWorld;
 
   constructor(worldScenePath?: any) {
     const scope = this;
@@ -204,7 +205,7 @@ export class World {
 
       // sepinaco: init procedural terrain
       if (this.isProceduralTerrain) {
-        const proceduralTerrainWorld = new ProceduralTerrainWorld(this);
+        this.proceduralTerrainWorld = new ProceduralTerrainWorld(this);
       }
 
     } else {
@@ -557,6 +558,11 @@ export class World {
       Debug_FPS: false,
       Sun_Elevation: 50,
       Sun_Rotation: 145,
+      Terrain_Size: 220,
+      Terrain_Height: 18,
+      Terrain_Roughness: 1.35,
+      Terrain_Segments: 80,
+      Terrain_Wireframe: false,
     };
 
     const gui = new GUI.GUI();
@@ -585,6 +591,42 @@ export class World {
       .onChange((value) => {
         scope.sky.theta = value;
       });
+
+    // Terrain
+    let terrainFolder = gui.addFolder("Terrain");
+    terrainFolder
+      .add(this.params, "Terrain_Size", 50, 400, 1)
+      .onChange(() => {
+        if (scope.proceduralTerrainWorld?.terrain) {
+          scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+        }
+      });
+    terrainFolder
+      .add(this.params, "Terrain_Height", 2, 60, 1)
+      .onChange(() => {
+        if (scope.proceduralTerrainWorld?.terrain) {
+          scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+        }
+      });
+    terrainFolder
+      .add(this.params, "Terrain_Roughness", 0.1, 3, 0.01)
+      .onChange(() => {
+        if (scope.proceduralTerrainWorld?.terrain) {
+          scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+        }
+      });
+    terrainFolder
+      .add(this.params, "Terrain_Segments", 20, 180, 1)
+      .onChange(() => {
+        if (scope.proceduralTerrainWorld?.terrain) {
+          scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+        }
+      });
+    terrainFolder.add(this.params, "Terrain_Wireframe").onChange(() => {
+      if (scope.proceduralTerrainWorld?.terrain) {
+        scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+      }
+    });
 
     // Input
     let settingsFolder = gui.addFolder("Settings");
