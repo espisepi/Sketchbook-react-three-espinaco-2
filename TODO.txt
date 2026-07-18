@@ -1,3 +1,30 @@
+
+- añadir juego tetris como sistema independiente
+que se conecta al proyecto, poner en carpeta
+third-party el codigo original del repositorio js y
+pedirle a cursor ai que cree un adaptador para meterlo
+dentro de mi juego
+
+- hacer lo mismo que lo anterior con emuladores de consolas,
+n64 js,
+gba o nes js y mostrar en 3d los componentes del emulador y
+que se activen si estan usandose, para ver como funciona
+el emulador por dentro visualmente. Crear pantalla ui visual,
+con los datos de los registro, hexadecimal y tal. pedirle
+que lo haga cursor ai xD (a ver si hay suerte y lo hace bien xD)
+
+- Añadirle multiplayer con framework nodejs open source colyseus
+-- https://github.com/hi337/ThreeChess
+-- https://docs.colyseus.io/
+-- https://github.com/colyseus/colyseus
+
+
+
+
+
+
+=================================
+
 Montar Sketchbook desdde cero en un nuevo proyecto
 añadir efectos de particulas con libro html5 most wanted
 

@@ -4,13 +4,16 @@
     ],
     "compilerOptions": {
         "module": "commonjs",
+        "strict": false,
         "target": "es5",
         "moduleResolution": "node",
         "declaration": true,
         "declarationDir": "build/types",
         "baseUrl": ".",
         "paths": {
-            "cannon" : ["src/lib/cannon/cannon"]
+            "cannon": [
+                "src/lib/cannon/cannon"
+            ]
         }
     }
 }
