@@ -17,6 +17,7 @@ export class ProceduralTerrain implements IUpdatable {
     private isSculpting: boolean = false;
     private brushMode: "raise" | "lower" = "raise";
     private heightValues: number[] = [];
+    private heightData: number[][] = [];
 
     constructor(world: World) {
         this.world = world;
@@ -158,6 +159,7 @@ export class ProceduralTerrain implements IUpdatable {
 
         this.geometry.verticesNeedUpdate = true;
         this.geometry.computeVertexNormals();
+        this.syncPhysicsBody();
     }
 
     private build(): void {
@@ -209,23 +211,85 @@ export class ProceduralTerrain implements IUpdatable {
 
         this.world.graphicsWorld.add(mesh);
 
+        this.mesh = mesh;
+        this.geometry = geometry;
+        this.material = material;
+        this.syncPhysicsBody();
+    }
+
+    private syncPhysicsBody(): void {
+        if (!this.geometry || !this.mesh) {
+            return;
+        }
+
+        const segments = this.params.segments;
+        const rows = segments + 1;
+        const cols = segments + 1;
+        const heightData: number[][] = [];
+
+        for (let row = 0; row < rows; row++) {
+            const rowValues: number[] = [];
+            for (let col = 0; col < cols; col++) {
+                const index = row * rows + col;
+                rowValues.push(this.heightValues[index] || 0);
+            }
+            heightData.push(rowValues);
+        }
+
+        this.heightData = heightData;
+
+        if (this.body) {
+            (this.world.physicsWorld as any).removeBody(this.body);
+            this.body = undefined;
+        }
+
+        const maxValue = this.getMaxHeight(heightData);
+        const minValue = this.getMinHeight(heightData);
+        const shape = new CANNON.Heightfield(heightData as any, {
+            elementSize: this.params.size / segments,
+            maxValue,
+            minValue,
+        });
+
         const body = new CANNON.Body({
             mass: 0,
             material: new CANNON.Material("terrain"),
         });
+        body.addShape(shape);
         body.position.set(0, 0, 0);
-        body.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+        body.quaternion.set(0, 0, 0, 1);
         body.updateBoundingRadius();
 
         this.world.physicsWorld.addBody(body);
-
-        this.mesh = mesh;
-        this.geometry = geometry;
-        this.material = material;
         this.body = body;
     }
 
+    private getMaxHeight(heightData: number[][]): number {
+        let maxValue = -Infinity;
+        for (let row = 0; row < heightData.length; row++) {
+            for (let col = 0; col < heightData[row].length; col++) {
+                maxValue = Math.max(maxValue, heightData[row][col]);
+            }
+        }
+        return Number.isFinite(maxValue) ? maxValue : 0;
+    }
+
+    private getMinHeight(heightData: number[][]): number {
+        let minValue = Infinity;
+        for (let row = 0; row < heightData.length; row++) {
+            for (let col = 0; col < heightData[row].length; col++) {
+                minValue = Math.min(minValue, heightData[row][col]);
+            }
+        }
+        return Number.isFinite(minValue) ? minValue : 0;
+    }
+
     private dispose(): void {
+        if (this.body) {
+            (this.world.physicsWorld as any).removeBody(this.body);
+            this.body = undefined;
+        }
+
         if (this.mesh && this.geometry && this.material) {
             this.world.graphicsWorld.remove(this.mesh);
             this.geometry.dispose();
@@ -235,11 +299,7 @@ export class ProceduralTerrain implements IUpdatable {
             this.material = undefined;
         }
 
-        if (this.body) {
-            (this.world.physicsWorld as any).removeBody(this.body);
-            this.body = undefined;
-        }
-
         this.heightValues = [];
+        this.heightData = [];
     }
 }

@@ -558,14 +558,14 @@ export class World {
       Debug_FPS: false,
       Sun_Elevation: 50,
       Sun_Rotation: 145,
-      Terrain_Size: 220,
-      Terrain_Height: 18,
-      Terrain_Roughness: 1.35,
-      Terrain_Segments: 80,
+      Terrain_Size: 180,
+      Terrain_Height: 10,
+      Terrain_Roughness: 0.9,
+      Terrain_Segments: 48,
       Terrain_Wireframe: false,
       Terrain_Edit_Enabled: true,
-      Brush_Size: 10,
-      Brush_Strength: 1.2,
+      Brush_Size: 6,
+      Brush_Strength: 0.7,
       Brush_Mode: "raise",
     };
 
@@ -599,14 +599,14 @@ export class World {
     // Terrain
     let terrainFolder = gui.addFolder("Terrain");
     terrainFolder
-      .add(this.params, "Terrain_Size", 50, 400, 1)
+      .add(this.params, "Terrain_Size", 50, 240, 1)
       .onChange(() => {
         if (scope.proceduralTerrainWorld?.terrain) {
           scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
         }
       });
     terrainFolder
-      .add(this.params, "Terrain_Height", 2, 60, 1)
+      .add(this.params, "Terrain_Height", 2, 24, 1)
       .onChange(() => {
         if (scope.proceduralTerrainWorld?.terrain) {
           scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
@@ -620,7 +620,7 @@ export class World {
         }
       });
     terrainFolder
-      .add(this.params, "Terrain_Segments", 20, 180, 1)
+      .add(this.params, "Terrain_Segments", 16, 96, 1)
       .onChange(() => {
         if (scope.proceduralTerrainWorld?.terrain) {
           scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
@@ -637,14 +637,14 @@ export class World {
       }
     });
     terrainFolder
-      .add(this.params, "Brush_Size", 1, 40, 0.5)
+      .add(this.params, "Brush_Size", 1, 20, 0.5)
       .onChange(() => {
         if (scope.proceduralTerrainWorld?.terrain) {
           scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
         }
       });
     terrainFolder
-      .add(this.params, "Brush_Strength", 0.1, 3, 0.1)
+      .add(this.params, "Brush_Strength", 0.1, 1.5, 0.1)
       .onChange(() => {
         if (scope.proceduralTerrainWorld?.terrain) {
           scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
