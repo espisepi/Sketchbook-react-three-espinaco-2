@@ -563,6 +563,10 @@ export class World {
       Terrain_Roughness: 1.35,
       Terrain_Segments: 80,
       Terrain_Wireframe: false,
+      Terrain_Edit_Enabled: true,
+      Brush_Size: 10,
+      Brush_Strength: 1.2,
+      Brush_Mode: "raise",
     };
 
     const gui = new GUI.GUI();
@@ -623,6 +627,30 @@ export class World {
         }
       });
     terrainFolder.add(this.params, "Terrain_Wireframe").onChange(() => {
+      if (scope.proceduralTerrainWorld?.terrain) {
+        scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+      }
+    });
+    terrainFolder.add(this.params, "Terrain_Edit_Enabled").onChange(() => {
+      if (scope.proceduralTerrainWorld?.terrain) {
+        scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+      }
+    });
+    terrainFolder
+      .add(this.params, "Brush_Size", 1, 40, 0.5)
+      .onChange(() => {
+        if (scope.proceduralTerrainWorld?.terrain) {
+          scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+        }
+      });
+    terrainFolder
+      .add(this.params, "Brush_Strength", 0.1, 3, 0.1)
+      .onChange(() => {
+        if (scope.proceduralTerrainWorld?.terrain) {
+          scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
+        }
+      });
+    terrainFolder.add(this.params, "Brush_Mode", ["raise", "lower"]).onChange(() => {
       if (scope.proceduralTerrainWorld?.terrain) {
         scope.proceduralTerrainWorld.terrain.updateFromParams(scope.params);
       }
