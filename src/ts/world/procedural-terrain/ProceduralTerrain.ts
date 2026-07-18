@@ -11,7 +11,6 @@ export class ProceduralTerrain {
     private params: any;
 
     constructor(world: World) {
-        debugger;
         this.world = world;
         this.params = {
             size: 220,
