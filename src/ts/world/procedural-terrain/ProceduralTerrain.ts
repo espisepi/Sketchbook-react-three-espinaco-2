@@ -86,15 +86,17 @@ export class ProceduralTerrain {
         this.world.graphicsWorld.add(mesh);
 
         const elementSize = size / segments;
-        const heightfieldShape = new CANNON.Heightfield(heightfieldData, {
-            elementSize,
-        });
+        // TODO: Fix temporal para que funcione el proyecto comentado. Se debe arreglar el heightfield de cannon.js para que funcione con la geometría generada.
+        // const heightfieldShape = new CANNON.Heightfield(heightfieldData, {
+        //     elementSize,
+        // });
 
         const body = new CANNON.Body({
             mass: 0,
             material: new CANNON.Material("terrain"),
         });
-        body.addShape(heightfieldShape);
+        // TODO: Fix temporal para que funcione el proyecto comentado. Se debe arreglar el heightfield de cannon.js para que funcione con la geometría generada.
+        // body.addShape(heightfieldShape);
         body.position.set(0, 0, 0);
         body.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
         body.updateBoundingRadius();
