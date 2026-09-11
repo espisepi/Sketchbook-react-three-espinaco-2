@@ -1,3 +1,14 @@
+==============================
+
+Physics custom properties for blender
+
+Added physics trimesh:
+{
+	data: "physics",
+	type: "trimesh"
+}
+
+==============================
 <p align="center">
 	<a href="https://jblaha.art/sketchbook/latest"><img src="./src/img/thumbnail.png"></a>
 	<br>
