@@ -3,6 +3,7 @@ import { VehicleSpawnPoint } from './VehicleSpawnPoint';
 import { CharacterSpawnPoint } from './CharacterSpawnPoint';
 import { World } from '../world/World';
 import { LoadingManager } from '../core/LoadingManager';
+import { Object3D } from 'three';
 
 export class Scenario
 {
@@ -14,12 +15,12 @@ export class Scenario
 	public descriptionTitle: string;
 	public descriptionContent: string;
 	
-	private rootNode: THREE.Object3D;
+	private rootNode: Object3D;
 	private spawnPoints: ISpawnPoint[] = [];
 	private invisible: boolean = false;
 	private initialCameraAngle: number;
 
-	constructor(root: THREE.Object3D, world: World)
+	constructor(root: Object3D, world: World)
 	{
 		this.rootNode = root;
 		this.world = world;

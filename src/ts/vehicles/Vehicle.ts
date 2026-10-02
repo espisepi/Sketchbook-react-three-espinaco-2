@@ -338,10 +338,8 @@ export abstract class Vehicle extends THREE.Object3D implements IWorldEntity
 				world.graphicsWorld.attach(wheel.wheelObject);
 			});
 
-			this.materials.forEach((mat) =>
-			{
-				world.sky.csm.setupMaterial(mat);
-			});
+			// three-csm shader integration (disabled for current Three.js).
+			// this.materials.forEach((mat) => world.sky.csm.setupMaterial(mat));
 		}
 	}
 

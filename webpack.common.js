@@ -15,6 +15,11 @@ module.exports = {
     alias: {
       cannon: path.resolve(__dirname, "./src/lib/cannon/cannon.js"),
     },
+    byDependency: {
+      commonjs: {
+        conditionNames: ["import", "..."],
+      },
+    },
     extensions: [".tsx", ".ts", ".js"],
   },
   module: {

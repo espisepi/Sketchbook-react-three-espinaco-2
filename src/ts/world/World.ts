@@ -95,7 +95,7 @@ export class World {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     this.generateHTML();
 
@@ -362,7 +362,7 @@ export class World {
       if (child.hasOwnProperty("userData")) {
         if (child.type === "Mesh") {
           Utils.setupMeshProperties(child);
-          this.sky.csm.setupMaterial(child.material);
+          // this.sky.csm.setupMaterial(child.material);
 
           if (child.material.name === "ocean") {
             this.registerUpdatable(new Ocean(child, this));
@@ -590,15 +590,8 @@ export class World {
     let settingsFolder = gui.addFolder("Settings");
     settingsFolder.add(this.params, "FXAA");
     settingsFolder.add(this.params, "Shadows").onChange((enabled) => {
-      if (enabled) {
-        this.sky.csm.lights.forEach((light) => {
-          light.castShadow = true;
-        });
-      } else {
-        this.sky.csm.lights.forEach((light) => {
-          light.castShadow = false;
-        });
-      }
+      this.sky.sunLight.castShadow = enabled;
+      // this.sky.csm.lights.forEach((light) => { light.castShadow = enabled; });
     });
     settingsFolder.add(this.params, "Pointer_Lock").onChange((enabled) => {
       scope.inputManager.setPointerLock(enabled);

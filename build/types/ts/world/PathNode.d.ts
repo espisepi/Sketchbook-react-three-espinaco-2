@@ -5,5 +5,5 @@ export declare class PathNode {
     path: Path;
     nextNode: PathNode;
     previousNode: PathNode;
-    constructor(child: THREE.Object3D, path: Path);
+    constructor(child: Object3D, path: Path);
 }

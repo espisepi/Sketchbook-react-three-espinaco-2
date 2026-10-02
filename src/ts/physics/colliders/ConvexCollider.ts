@@ -2,7 +2,6 @@ import * as CANNON from 'cannon';
 import * as THREE from 'three';
 import * as Utils from '../../core/FunctionLibrary';
 import { ICollider } from '../../interfaces/ICollider';
-import {Mesh, Vector3} from 'three';
 import {Object3D} from 'three';
 
 export class ConvexCollider implements ICollider
@@ -28,20 +27,34 @@ export class ConvexCollider implements ICollider
 		mat.friction = options.friction;
 		// mat.restitution = 0.7;
 
-		if (this.mesh.geometry.isBufferGeometry)
+		const geometry: THREE.BufferGeometry = this.mesh.geometry;
+		const positions = geometry.getAttribute('position');
+		if (!positions)
 		{
-			this.mesh.geometry = new THREE.Geometry().fromBufferGeometry(this.mesh.geometry);
+			throw new Error('ConvexCollider requires geometry with a position attribute.');
 		}
 
-		let cannonPoints = this.mesh.geometry.vertices.map((v: Vector3) => {
-			return new CANNON.Vec3( v.x, v.y, v.z );
-		});
-		
-		let cannonFaces = this.mesh.geometry.faces.map((f: any) => {
-			return [f.a, f.b, f.c];
-		});
+		const cannonPoints: CANNON.Vec3[] = [];
+		for (let i = 0; i < positions.count; i++)
+		{
+			cannonPoints.push(new CANNON.Vec3(positions.getX(i), positions.getY(i), positions.getZ(i)));
+		}
 
-		let shape = new CANNON.ConvexPolyhedron(cannonPoints, cannonFaces);
+		const indices = geometry.index;
+		const cannonFaces: number[][] = [];
+		const indexCount = indices ? indices.count : positions.count;
+		for (let i = 0; i + 2 < indexCount; i += 3)
+		{
+			cannonFaces.push([
+				indices ? indices.getX(i) : i,
+				indices ? indices.getX(i + 1) : i + 1,
+				indices ? indices.getX(i + 2) : i + 2
+			]);
+		}
+
+		const shape = new CANNON.ConvexPolyhedron(cannonPoints);
+		shape.faces = cannonFaces;
+		shape.computeNormals();
 		// shape.material = mat;
 
 		// Add phys sphere

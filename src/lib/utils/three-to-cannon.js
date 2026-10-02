@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { quickhull } from './THREE.quickhull';
+import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 
 var PI_2 = Math.PI / 2;
 
@@ -40,25 +40,17 @@ export const threeToCannon = function (object, options) {
   geometry = getGeometry(object);
   if (!geometry) return null;
 
-  var type = geometry.metadata
-    ? geometry.metadata.type
-    : geometry.type;
+  var type = geometry.type;
 
   switch (type) {
     case 'BoxGeometry':
-    case 'BoxBufferGeometry':
       return createBoxShape(geometry);
     case 'CylinderGeometry':
-    case 'CylinderBufferGeometry':
       return createCylinderShape(geometry);
     case 'PlaneGeometry':
-    case 'PlaneBufferGeometry':
       return createPlaneShape(geometry);
     case 'SphereGeometry':
-    case 'SphereBufferGeometry':
       return createSphereShape(geometry);
-    case 'TubeGeometry':
-    case 'Geometry':
     case 'BufferGeometry':
       return createBoundingBoxShape(object);
     default:
@@ -74,7 +66,7 @@ threeToCannon.Type = Type;
  */
 
  /**
-  * @param  {THREE.Geometry} geometry
+  * @param  {THREE.BufferGeometry} geometry
   * @return {CANNON.Shape}
   */
  function createBoxShape (geometry) {
@@ -128,46 +120,57 @@ function createBoundingBoxShape (object) {
  * @return {CANNON.Shape}
  */
 function createConvexPolyhedron (object) {
-  var i, vertices, faces, hull,
-      eps = 1e-4,
-      geometry = getGeometry(object);
+  var geometry = getGeometry(object);
+  if (!geometry) return null;
 
-  if (!geometry || !geometry.vertices.length) return null;
+  var positions = geometry.getAttribute('position');
+  if (!positions || positions.count < 4) return null;
 
-  // Perturb.
-  for (i = 0; i < geometry.vertices.length; i++) {
-    geometry.vertices[i].x += (Math.random() - 0.5) * eps;
-    geometry.vertices[i].y += (Math.random() - 0.5) * eps;
-    geometry.vertices[i].z += (Math.random() - 0.5) * eps;
+  var points = [];
+  for (var i = 0; i < positions.count; i++) {
+    points.push(new THREE.Vector3(positions.getX(i), positions.getY(i), positions.getZ(i)));
   }
 
-  // Compute the 3D convex hull.
-  hull = quickhull(geometry);
+  var hull = new ConvexGeometry(points);
+  var hullPositions = hull.getAttribute('position');
+  var vertices = [];
+  var faces = [];
+  var vertexIndices = new Map();
 
-  // Convert from THREE.Vector3 to CANNON.Vec3.
-  vertices = new Array(hull.vertices.length);
-  for (i = 0; i < hull.vertices.length; i++) {
-    vertices[i] = new CANNON.Vec3(hull.vertices[i].x, hull.vertices[i].y, hull.vertices[i].z);
+  for (var i = 0; i < hullPositions.count; i += 3) {
+    var face = [];
+    for (var j = 0; j < 3; j++) {
+      var point = new THREE.Vector3(
+        hullPositions.getX(i + j),
+        hullPositions.getY(i + j),
+        hullPositions.getZ(i + j)
+      );
+      var key = point.x + ',' + point.y + ',' + point.z;
+      var vertexIndex = vertexIndices.get(key);
+      if (vertexIndex === undefined) {
+        vertexIndex = vertices.length;
+        vertexIndices.set(key, vertexIndex);
+        vertices.push(new CANNON.Vec3(point.x, point.y, point.z));
+      }
+      face.push(vertexIndex);
+    }
+    faces.push(face);
   }
 
-  // Convert from THREE.Face to Array<number>.
-  faces = new Array(hull.faces.length);
-  for (i = 0; i < hull.faces.length; i++) {
-    faces[i] = [hull.faces[i].a, hull.faces[i].b, hull.faces[i].c];
-  }
-
-  return new CANNON.ConvexPolyhedron(vertices, faces);
+  hull.dispose();
+  var shape = new CANNON.ConvexPolyhedron(vertices);
+  shape.faces = faces;
+  shape.computeNormals();
+  return shape;
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createCylinderShape (geometry) {
   var shape,
-      params = geometry.metadata
-        ? geometry.metadata.parameters
-        : geometry.parameters;
+      params = geometry.parameters;
   shape = new CANNON.Cylinder(
     params.radiusTop,
     params.radiusBottom,
@@ -183,7 +186,7 @@ function createCylinderShape (geometry) {
   shape.numSegments = params.radialSegments;
 
   shape.orientation = new CANNON.Quaternion();
-  shape.orientation.setFromEuler(THREE.Math.degToRad(90), 0, 0, 'XYZ').normalize();
+  shape.orientation.setFromEuler(Math.PI / 2, 0, 0, 'XYZ').normalize();
   return shape;
 }
 
@@ -230,7 +233,7 @@ function createBoundingCylinderShape (object, options) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createPlaneShape (geometry) {
@@ -244,13 +247,11 @@ function createPlaneShape (geometry) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createSphereShape (geometry) {
-  var params = geometry.metadata
-    ? geometry.metadata.parameters
-    : geometry.parameters;
+  var params = geometry.parameters;
   return new CANNON.Sphere(params.radius);
 }
 
@@ -269,16 +270,17 @@ function createBoundingSphereShape (object, options) {
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {CANNON.Shape}
  */
 function createTrimeshShape (geometry) {
-  var indices,
-      vertices = getVertices(geometry);
+  var position = geometry.getAttribute('position');
+  if (!position || position.count === 0) return null;
 
-  if (!vertices.length) return null;
-
-  indices = Object.keys(vertices).map(Number);
+  var vertices = Array.from(position.array);
+  var indices = geometry.index
+    ? Array.from(geometry.index.array)
+    : Array.from({ length: position.count }, function (_, index) { return index; });
   return new CANNON.Trimesh(vertices, indices);
 }
 
@@ -290,65 +292,68 @@ function createTrimeshShape (geometry) {
  * Returns a single geometry for the given object. If the object is compound,
  * its geometries are automatically merged.
  * @param {THREE.Object3D} object
- * @return {THREE.Geometry}
+ * @return {THREE.BufferGeometry}
  */
 function getGeometry (object) {
-  var matrix, mesh,
-      meshes = getMeshes(object),
-      tmp = new THREE.Geometry(),
-      combined = new THREE.Geometry();
+  var meshes = getMeshes(object);
 
   if (meshes.length === 0) return null;
 
-  // Apply scale  – it can't easily be applied to a CANNON.Shape later.
+  object.updateWorldMatrix(true, true);
+  var inverseRoot = new THREE.Matrix4().copy(object.matrixWorld).invert();
+  var rootScale = new THREE.Matrix4().makeScale(object.scale.x, object.scale.y, object.scale.z);
   if (meshes.length === 1) {
-    var position = new THREE.Vector3(),
-        quaternion = new THREE.Quaternion(),
-        scale = new THREE.Vector3();
-    if (meshes[0].geometry.isBufferGeometry) {
-      if (meshes[0].geometry.attributes.position
-          && meshes[0].geometry.attributes.position.itemSize > 2) {
-        tmp.fromBufferGeometry(meshes[0].geometry);
-      }
-    } else {
-      tmp = meshes[0].geometry.clone();
-    }
-    tmp.metadata = meshes[0].geometry.metadata;
-    meshes[0].updateMatrixWorld();
-    meshes[0].matrixWorld.decompose(position, quaternion, scale);
-    return tmp.scale(scale.x, scale.y, scale.z);
+    var geometry = meshes[0].geometry.clone();
+    var relativeMatrix = new THREE.Matrix4()
+      .multiplyMatrices(inverseRoot, meshes[0].matrixWorld);
+    relativeMatrix.premultiply(rootScale);
+    return geometry.applyMatrix4(relativeMatrix);
   }
 
-  // Recursively merge geometry, preserving local transforms.
-  while ((mesh = meshes.pop())) {
-    mesh.updateMatrixWorld();
-    if (mesh.geometry.isBufferGeometry) {
-      if (mesh.geometry.attributes.position
-          && mesh.geometry.attributes.position.itemSize > 2) {
-        var tmpGeom = new THREE.Geometry();
-        tmpGeom.fromBufferGeometry(mesh.geometry);
-        combined.merge(tmpGeom, mesh.matrixWorld);
-        tmpGeom.dispose();
-      }
-    } else {
-      combined.merge(mesh.geometry, mesh.matrixWorld);
-    }
-  }
+  var vertices = [];
+  var indices = [];
+  meshes.forEach(function (mesh) {
+    var geometry = mesh.geometry.clone();
+    var relativeMatrix = new THREE.Matrix4()
+      .multiplyMatrices(inverseRoot, mesh.matrixWorld);
+    relativeMatrix.premultiply(rootScale);
+    geometry.applyMatrix4(relativeMatrix);
 
-  matrix = new THREE.Matrix4();
-  matrix.scale(object.scale);
-  combined.applyMatrix(matrix);
+    var positions = geometry.getAttribute('position');
+    if (positions) {
+      var baseIndex = vertices.length / 3;
+      for (var i = 0; i < positions.count; i++) {
+        vertices.push(positions.getX(i), positions.getY(i), positions.getZ(i));
+      }
+
+      if (geometry.index) {
+        for (var i = 0; i < geometry.index.count; i++) {
+          indices.push(baseIndex + geometry.index.getX(i));
+        }
+      } else {
+        for (var i = 0; i < positions.count; i++) {
+          indices.push(baseIndex + i);
+        }
+      }
+    }
+    geometry.dispose();
+  });
+
+  if (vertices.length === 0) return null;
+
+  var combined = new THREE.BufferGeometry();
+  combined.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  combined.setIndex(indices);
+  combined.computeVertexNormals();
+  combined.computeBoundingSphere();
   return combined;
 }
 
 /**
- * @param  {THREE.Geometry} geometry
+ * @param  {THREE.BufferGeometry} geometry
  * @return {Array<number>}
  */
 function getVertices (geometry) {
-  if (!geometry.attributes) {
-    geometry = new THREE.BufferGeometry().fromGeometry(geometry);
-  }
   return (geometry.attributes.position || {}).array || [];
 }
 

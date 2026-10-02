@@ -1,5 +1,6 @@
 import { World } from '../world/World';
 import { LoadingManager } from '../core/LoadingManager';
+import { Object3D } from 'three';
 export declare class Scenario {
     id: string;
     name: string;
@@ -12,7 +13,7 @@ export declare class Scenario {
     private spawnPoints;
     private invisible;
     private initialCameraAngle;
-    constructor(root: THREE.Object3D, world: World);
+    constructor(root: Object3D, world: World);
     createLaunchLink(): void;
     launch(loadingManager: LoadingManager, world: World): void;
 }

@@ -5,7 +5,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "strict": false,
-        "target": "es5",
+        "target": "ES2015",
         "moduleResolution": "node",
         "declaration": true,
         "declarationDir": "build/types",

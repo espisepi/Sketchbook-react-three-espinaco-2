@@ -1,8 +1,9 @@
+import { Object3D, Vector3 } from 'three';
 export declare class Wheel {
-    wheelObject: THREE.Object3D;
-    position: THREE.Vector3;
+    wheelObject: Object3D;
+    position: Vector3;
     steering: boolean;
     drive: string;
     rayCastWheelInfoIndex: number;
-    constructor(wheelObject: THREE.Object3D);
+    constructor(wheelObject: Object3D);
 }

@@ -3,14 +3,15 @@ import * as THREE from 'three';
 import { World } from './World';
 import { EntityType } from '../enums/EntityType';
 import { IUpdatable } from '../interfaces/IUpdatable';
-import { default as CSM } from 'three-csm';
+// import { default as CSM } from 'three-csm';
 
 export class Sky extends THREE.Object3D implements IUpdatable
 {
 	public updateOrder: number = 5;
 
 	public sunPosition: THREE.Vector3 = new THREE.Vector3();
-	public csm: CSM;
+	public sunLight: THREE.DirectionalLight;
+	// public csm: CSM;
 
 	set theta(value: number) {
 		this._theta = value;
@@ -27,6 +28,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 	private _theta: number = 145;
 
 	private hemiLight: THREE.HemisphereLight;
+
 	private maxHemiIntensity: number = 0.9;
 	private minHemiIntensity: number = 0.3;
 
@@ -51,7 +53,7 @@ export class Sky extends THREE.Object3D implements IUpdatable
 
 		// Mesh
 		this.skyMesh = new THREE.Mesh(
-			new THREE.SphereBufferGeometry(1000, 24, 12),
+			new THREE.SphereGeometry(1000, 24, 12),
 			this.skyMaterial
 		);
 		this.attach(this.skyMesh);
@@ -64,41 +66,40 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		this.hemiLight.position.set( 0, 50, 0 );
 		this.world.graphicsWorld.add( this.hemiLight );
 
-		// CSM
-		// New version
-		// let splitsCallback = (amount, near, far, target) =>
+		// three-csm patches Three.js shader chunks that changed in newer releases.
+		// Keep this legacy setup disabled until it is updated for current Three.js.
+		// let splitsCallback = (amount, near, far) =>
 		// {
+		// 	let splits = [];
 		// 	for (let i = amount - 1; i >= 0; i--)
 		// 	{
-		// 		target.push(Math.pow(1 / 3, i));
+		// 		splits.push(Math.pow(1 / 4, i));
 		// 	}
+		// 	return splits;
 		// };
+		// this.csm = new CSM({
+		// 	maxFar: 250,
+		// 	lightIntensity: 2.5,
+		// 	cascades: 3,
+		// 	shadowMapSize: 2048,
+		// 	camera: world.camera,
+		// 	parent: world.graphicsWorld,
+		// 	mode: 'custom',
+		// 	customSplitsCallback: splitsCallback
+		// });
+		// this.csm.fade = true;
 
-		// Legacy
-		let splitsCallback = (amount, near, far) =>
-		{
-			let arr = [];
-
-			for (let i = amount - 1; i >= 0; i--)
-			{
-				arr.push(Math.pow(1 / 4, i));
-			}
-
-			return arr;
-		};
-
-		this.csm = new CSM({
-			fov: 80,
-			far: 250,	// maxFar
-			lightIntensity: 2.5,
-			cascades: 3,
-			shadowMapSize: 2048,
-			camera: world.camera,
-			parent: world.graphicsWorld,
-			mode: 'custom',
-			customSplitsCallback: splitsCallback
-		});
-		this.csm.fade = true;
+		this.sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
+		this.sunLight.position.copy(this.sunPosition).multiplyScalar(100);
+		this.sunLight.castShadow = true;
+		this.sunLight.shadow.mapSize.set(2048, 2048);
+		this.sunLight.shadow.camera.left = -250;
+		this.sunLight.shadow.camera.right = 250;
+		this.sunLight.shadow.camera.top = 250;
+		this.sunLight.shadow.camera.bottom = -250;
+		this.sunLight.shadow.camera.far = 600;
+		this.sunLight.shadow.camera.updateProjectionMatrix();
+		world.graphicsWorld.add(this.sunLight);
 
 		this.refreshSunPosition();
 		
@@ -111,8 +112,9 @@ export class Sky extends THREE.Object3D implements IUpdatable
 		this.position.copy(this.world.camera.position);
 		this.refreshSunPosition();
 
-		this.csm.update(this.world.camera.matrix);
-		this.csm.lightDirection = new THREE.Vector3(-this.sunPosition.x, -this.sunPosition.y, -this.sunPosition.z).normalize();
+		this.sunLight.position.copy(this.sunPosition).multiplyScalar(100);
+		// this.csm.lightDirection = new THREE.Vector3(-this.sunPosition.x, -this.sunPosition.y, -this.sunPosition.z).normalize();
+		// this.csm.update();
 	}
 
 	public refreshSunPosition(): void

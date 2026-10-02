@@ -1,5 +1,6 @@
+import { Vector3 } from 'three';
 export declare class SimulationFrameVector {
-    position: THREE.Vector3;
-    velocity: THREE.Vector3;
-    constructor(position: THREE.Vector3, velocity: THREE.Vector3);
+    position: Vector3;
+    velocity: Vector3;
+    constructor(position: Vector3, velocity: Vector3);
 }

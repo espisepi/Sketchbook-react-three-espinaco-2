@@ -13,12 +13,11 @@
  * Node.js module implementation by Danila Loginov https://loginov.rocks
  */
 
-const THREE = require('three');
+import * as THREE from 'three';
 
 export let SkyShader = {
 
     uniforms: {
-      luminance: {value: 1},
       turbidity: {value: 2},
       rayleigh: {value: 1},
       mieCoefficient: {value: 0.005},
@@ -109,7 +108,6 @@ export let SkyShader = {
       varying vec3 vBetaM;
       varying float vSunE;
   
-      uniform float luminance;
       uniform float mieDirectionalG;
       uniform vec3 cameraPos;
   

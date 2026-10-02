@@ -1,11 +1,12 @@
 import { PathNode } from './PathNode';
+import { Object3D } from 'three';
 
 export class Path
 {
 	public nodes: {[nodeName: string]: PathNode} = {};
-	private rootNode: THREE.Object3D;
+	private rootNode: Object3D;
 
-	constructor(root: THREE.Object3D)
+	constructor(root: Object3D)
 	{
 		this.rootNode = root;
 
