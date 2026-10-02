@@ -1,4 +1,10 @@
 import { World } from "../World";
-export declare class ProceduralTerrainWorld {
+import { IUpdatable } from "../../interfaces/IUpdatable";
+export declare class ProceduralTerrainWorld implements IUpdatable {
+    readonly updateOrder: number;
+    private readonly world;
+    private readonly terrain;
     constructor(world: World);
+    update(_timeStep: number, _unscaledTimeStep: number): void;
+    dispose(): void;
 }

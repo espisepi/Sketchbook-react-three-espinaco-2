@@ -956,7 +956,7 @@ declare module CANNON {
         pillarOffset: Vec3;
         type: number;
 
-        constructor(data: number[], options?: IHightfield);
+        constructor(data: number[][], options?: IHightfield);
 
         update(): void;
         updateMinValue(): void;
