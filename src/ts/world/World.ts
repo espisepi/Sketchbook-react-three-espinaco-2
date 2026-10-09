@@ -33,6 +33,7 @@ import { Sky } from "./Sky";
 import { Ocean } from "./Ocean";
 import { ReplaceTextureVideoclip } from "./ReplaceTextureVideoclip";
 import { ProceduralTerrainWorld } from "./procedural-terrain/ProceduralTerrainWorld";
+import { CesiumSevilleBuildings } from "./CesiumSevilleBuildings";
 
 export class World {
   public renderer: THREE.WebGLRenderer;
@@ -64,6 +65,7 @@ export class World {
   public paths: Path[] = [];
   public scenarioGUIFolder: any;
   public updatables: IUpdatable[] = [];
+  public cesiumSevilleBuildings: CesiumSevilleBuildings;
 
   private lastScenarioID: string;
 
@@ -172,6 +174,7 @@ export class World {
       this.params.Mouse_Sensitivity
     );
     this.sky = new Sky(this);
+    this.cesiumSevilleBuildings = new CesiumSevilleBuildings(this);
 
     // Load scene if path is supplied
     if (worldScenePath !== undefined) {
@@ -557,6 +560,7 @@ export class World {
       Debug_FPS: false,
       Sun_Elevation: 50,
       Sun_Rotation: 145,
+      Seville_3D_Buildings: false,
     };
 
     const gui = new GUI.GUI();
@@ -584,6 +588,29 @@ export class World {
       .listen()
       .onChange((value) => {
         scope.sky.theta = value;
+      });
+    worldFolder
+      .add(this.params, "Seville_3D_Buildings")
+      .listen()
+      .onChange((enabled) => {
+        if (!this.cesiumSevilleBuildings) {
+          return;
+        }
+
+        this.cesiumSevilleBuildings.setEnabled(enabled).then((accepted) => {
+          if (!accepted) {
+            this.params.Seville_3D_Buildings = false;
+          }
+        }).catch((error) => {
+          console.error("No se pudo inicializar el mapa 3D de Sevilla.", error);
+          this.params.Seville_3D_Buildings = false;
+          void Swal.fire({
+            icon: "error",
+            title: "No se pudo inicializar Cesium",
+            text: "Consulta la consola para ver el detalle del error.",
+            buttonsStyling: false,
+          });
+        });
       });
 
     // Input

@@ -96,6 +96,10 @@ const world = new World('scene.glb');
 
 -->
 
+## Cesium: Sevilla en 3D
+
+La escena puede mostrar los edificios 3D de Sevilla de Cesium ion dentro del render Three.js. Consulta la [guía de configuración del token y uso](./documentacion/Cesium-Sevilla.md).
+
 ## Contributing
 
 1. Get the LTS version of [Node.js](https://nodejs.org/en/) 16
